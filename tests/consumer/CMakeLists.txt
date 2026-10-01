@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 project(iiDecisionInstalledConsumer LANGUAGES CXX)
 include(CTest)
-find_package(iiDecision 0.0.1 EXACT CONFIG REQUIRED)
+find_package(iiDecision 0.0.2 EXACT CONFIG REQUIRED)
 add_executable(iiDecisionConsumer main.cpp)
 target_link_libraries(iiDecisionConsumer PRIVATE iiDecision::iiDecision)
 add_test(NAME iiDecision.InstalledConsumer COMMAND iiDecisionConsumer)

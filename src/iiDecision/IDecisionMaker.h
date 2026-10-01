@@ -2,6 +2,7 @@
 
 #include <span>
 #include <string>
+#include <vector>
 
 namespace iiDecision {
 
@@ -9,7 +10,14 @@ struct Candidate {
     std::string id;
 };
 
-struct Context {};
+struct Observation {
+    std::string key;
+    std::string value;
+};
+
+struct Context {
+    std::vector<Observation> observations;
+};
 
 struct Decision {
     std::string candidate_id;
