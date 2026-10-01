@@ -5,7 +5,7 @@
 #include <iostream>
 #include <utility>
 
-int main()
+int main(int argc,char** argv)
 {
     try {
         std::vector<iiDecision::JointState> states;
@@ -20,7 +20,11 @@ int main()
         if (x >= 0) context.observations.push_back({"x", std::to_string(x)});
         if (y >= 0) context.observations.push_back({"y", std::to_string(y)});
         const std::array candidates{iiDecision::Candidate{"A"}, iiDecision::Candidate{"B"}, iiDecision::Candidate{"C"}};
-        const auto report = iiDecision::ExactDecisionMaker(std::move(states)).evaluate(context, candidates);
+        iiDecision::AccelerationOptions options;
+        options.mode = iiDecision::ExecutionMode::CpuOnly;
+        if (argc > 1) { options.mode = iiDecision::ExecutionMode::RequireAccelerators; options.backend_ids = {argv[1]}; }
+        auto matcher = std::make_shared<iiDecision::EvidenceMatcher>(options);
+        const auto report = iiDecision::ExactDecisionMaker(std::move(states),matcher).evaluate(context, candidates);
         std::cout << std::setprecision(std::numeric_limits<long double>::max_digits10)
                   << iiDecision::probability_mantissa_bits << ' ' << report.log_evidence_probability
                   << ' ' << report.entropy << ' ' << report.normalization_error

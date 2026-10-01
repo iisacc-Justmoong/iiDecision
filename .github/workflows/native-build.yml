@@ -1,0 +1,64 @@
+name: Native build and precision checks
+# Explicit dispatch permits choosing when to use hosted runner quota.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Linux compute SDKs
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libvulkan-dev ocl-icd-opencl-dev mesa-vulkan-drivers pocl-opencl-icd
+      - name: Fetch official ONNX Runtime SDK
+        shell: bash
+        run: |
+          mkdir -p build
+          python tools/fetch_onnx.py > build/onnx-path.txt
+          echo "ONNXRuntime_ROOT=$(cat build/onnx-path.txt)" >> "$GITHUB_ENV"
+          echo "$(cat build/onnx-path.txt)/lib" >> "$GITHUB_PATH"
+      - name: Build and test
+        shell: bash
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DIIDECISION_ONNX=ON -DONNXRuntime_ROOT="$ONNXRuntime_ROOT"
+          cmake --build build --config Release --parallel 2
+          ctest --test-dir build -C Release --output-on-failure
+          cmake --install build --config Release --prefix "$PWD/build/stage"
+          cmake -S tests/consumer -B build/consumer/build -DCMAKE_BUILD_TYPE=Release -DiiDecision_DIR="$PWD/build/stage/lib/cmake/iiDecision" -DONNXRuntime_ROOT="$ONNXRuntime_ROOT"
+          cmake --build build/consumer/build --config Release --parallel 2
+          ctest --test-dir build/consumer/build -C Release --output-on-failure
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: precision-${{ matrix.os }}
+          path: |
+            build/decimal-oracle.json
+            build/Testing/Temporary/LastTest.log
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Android arm64 native core and Vulkan
+        run: |
+          cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 -DBUILD_TESTING=OFF -DIIDECISION_BUILD_EXAMPLES=OFF -DIIDECISION_METAL=OFF -DIIDECISION_MLX=OFF -DIIDECISION_OPENCL=OFF -DIIDECISION_ONNX=OFF -DIIDECISION_VULKAN=ON
+          cmake --build build --parallel 2
+  ios:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iOS arm64 and Metal
+        run: |
+          cmake -S . -B build -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO -DBUILD_TESTING=OFF -DIIDECISION_BUILD_EXAMPLES=OFF -DIIDECISION_METAL=ON -DIIDECISION_MLX=OFF -DIIDECISION_OPENCL=OFF -DIIDECISION_VULKAN=OFF -DIIDECISION_ONNX=OFF
+          cmake --build build --config Release --parallel 2

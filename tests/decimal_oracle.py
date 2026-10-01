@@ -5,12 +5,13 @@ import itertools
 import json
 import pathlib
 import platform
+import re
 import subprocess
 import sys
 
 decimal.getcontext().prec = 90
 D = decimal.Decimal
-driver, output = sys.argv[1:]
+driver, output, *driver_args = sys.argv[1:]
 cases = []
 maximum_error = D(0)
 metric_errors = {name: D(0) for name in ('probability', 'log_probability', 'log_evidence', 'entropy', 'scaled')}
@@ -36,7 +37,7 @@ for fixture in range(19):
         references = [(mass / total).ln(), -sum(p * p.ln() for p in expected)]
         references.extend(v for p in expected for v in (p, p.ln()))
         payload = '\n'.join(map(str, logs)) + f'\n{x} {y}\n'
-        run = subprocess.run([driver], input=payload, text=True, capture_output=True, check=True)
+        run = subprocess.run([driver, *driver_args], input=payload, text=True, capture_output=True, check=True)
         fields = run.stdout.split()
         bits = int(fields[0])
         tolerance = D(64) * D(2) ** (1 - bits)
@@ -73,20 +74,25 @@ root = pathlib.Path(__file__).resolve().parents[1]
 sources = sorted(p for folder in ('src', 'tests') for p in (root / folder).rglob('*')
                  if p.is_file() and 'build' not in p.parts and '__pycache__' not in p.parts)
 sources.append(root / 'CMakeLists.txt')
-cache = pathlib.Path(driver).parent / 'CMakeCache.txt'
+cache = next(parent / 'CMakeCache.txt' for parent in
+             (pathlib.Path(driver).resolve().parent, *pathlib.Path(driver).resolve().parents)
+             if (parent / 'CMakeCache.txt').exists())
 configuration = {}
 for line in cache.read_text().splitlines():
     if '=' in line and ':' in line and not line.startswith(('//', '#')):
         key = line.split(':', 1)[0]
-        if key in ('BUILD_SHARED_LIBS', 'CMAKE_BUILD_TYPE', 'CMAKE_CXX_COMPILER', 'CMAKE_CXX_FLAGS'):
+        if key in ('BUILD_SHARED_LIBS', 'CMAKE_BUILD_TYPE', 'CMAKE_CXX_COMPILER', 'CMAKE_CXX_FLAGS',
+                   'MLX_DIR', 'ONNXRuntime_LIBRARY', 'ONNXRuntime_INCLUDE_DIR', 'Vulkan_LIBRARY') or key.startswith('IIDECISION_'):
             configuration[key] = line.split('=', 1)[1]
-report = {'version': '0.0.2', 'reference_precision_digits': 90, 'mantissa_bits': bits,
+version = re.search(r'project\(iiDecision VERSION (\S+)', (root / 'CMakeLists.txt').read_text()).group(1)
+report = {'version': version, 'reference_precision_digits': 90, 'mantissa_bits': bits,
           'platform': platform.platform(), 'cases': cases, 'case_count': len(cases),
           'maximum_absolute_error': str(maximum_error), 'relative_tolerance': str(tolerance),
           'maximum_errors_by_metric': {k: str(v) for k, v in metric_errors.items()},
           'numeric_fields': ['log_evidence', 'entropy', 'p_A', 'log_p_A', 'p_B', 'log_p_B', 'p_C', 'log_p_C'],
           'build_configuration': configuration,
           'driver_sha256': hashlib.sha256(pathlib.Path(driver).read_bytes()).hexdigest(),
+          'driver_args': driver_args,
           'source_sha256': {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}}
 pathlib.Path(output).write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
 print(f'{len(cases)} independent Decimal cases passed; mantissa={bits}; max absolute error={maximum_error}')

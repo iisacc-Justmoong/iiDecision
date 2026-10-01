@@ -29,8 +29,8 @@ Assignment canonical(std::span<const Observation> observations)
 
 } // namespace
 
-ExactDecisionMaker::ExactDecisionMaker(std::vector<JointState> states)
-    : states_(std::move(states))
+ExactDecisionMaker::ExactDecisionMaker(std::vector<JointState> states, std::shared_ptr<EvidenceMatcher> matcher)
+    : states_(std::move(states)), matcher_(std::move(matcher))
 {
     if (states_.empty()) throw std::invalid_argument("a joint model needs states");
     std::set<std::pair<std::string, Assignment>> assignments;
@@ -58,6 +58,21 @@ ExactDecisionMaker::ExactDecisionMaker(std::vector<JointState> states)
     if (detail::logNormalizer(weights).maximum == detail::negative_infinity) {
         throw std::invalid_argument("joint model must have positive total mass");
     }
+    if (!matcher_) {
+        static auto default_matcher = std::make_shared<EvidenceMatcher>();
+        matcher_ = default_matcher;
+    }
+    schema_ = std::move(schema);
+    categories_.resize(schema_.size());
+    for (std::size_t c = 0; c < schema_.size(); ++c) {
+        std::set<std::string> values;
+        for (const auto& state : states_) values.insert(state.observations[c].value);
+        if (values.size() > UINT32_MAX) throw std::length_error("too many categorical values");
+        categories_[c].assign(values.begin(),values.end());
+    }
+    for (const auto& state : states_) for (std::size_t c = 0; c < schema_.size(); ++c)
+        encoded_states_.push_back(static_cast<std::uint32_t>(std::lower_bound(
+            categories_[c].begin(),categories_[c].end(),state.observations[c].value)-categories_[c].begin()));
 }
 
 ProbabilityReport ExactDecisionMaker::evaluate(const Context& context, std::span<const Candidate> candidates) const
@@ -71,24 +86,27 @@ ProbabilityReport ExactDecisionMaker::evaluate(const Context& context, std::span
     if (required != supplied) throw std::invalid_argument("candidates must equal the complete model candidate set");
 
     const auto observations = canonical(context.observations);
+    std::vector<std::size_t> columns;
+    std::vector<std::uint32_t> query, values;
     for (const auto& [key, value] : observations) {
-        bool known = false;
-        for (const auto& state : states_) for (const auto& observation : state.observations) {
-            if (observation.key == key && observation.value == value) known = true;
-        }
-        if (!known) throw std::invalid_argument("unknown observation key or value");
+        const auto found = std::lower_bound(schema_.begin(),schema_.end(),key);
+        if (found == schema_.end() || *found != key) throw std::invalid_argument("unknown observation key");
+        const auto column = static_cast<std::size_t>(found-schema_.begin());
+        const auto category = std::lower_bound(categories_[column].begin(),categories_[column].end(),value);
+        if (category == categories_[column].end() || *category != value) throw std::invalid_argument("unknown observation value");
+        columns.push_back(column);
+        query.push_back(static_cast<std::uint32_t>(category-categories_[column].begin()));
     }
+    for (std::size_t r = 0; r < states_.size(); ++r) for (const auto c : columns)
+        values.push_back(encoded_states_[r*schema_.size()+c]);
+    auto matching = matcher_->match(states_.size(),values,query);
 
     std::vector<long double> all_weights, matched_weights;
     std::vector<std::vector<long double>> candidate_weights(candidates.size());
-    for (const auto& state : states_) {
+    for (std::size_t row = 0; row < states_.size(); ++row) {
+        const auto& state = states_[row];
         all_weights.push_back(state.log_weight);
-        const bool matches = std::all_of(observations.begin(), observations.end(), [&](const auto& item) {
-            return std::any_of(state.observations.begin(), state.observations.end(), [&](const auto& observation) {
-                return observation.key == item.first && observation.value == item.second;
-            });
-        });
-        if (!matches) continue;
+        if (!matching.mask[row]) continue;
         matched_weights.push_back(state.log_weight);
         for (std::size_t i = 0; i < candidates.size(); ++i) {
             if (candidates[i].id == state.candidate_id) candidate_weights[i].push_back(state.log_weight);
@@ -100,6 +118,7 @@ ProbabilityReport ExactDecisionMaker::evaluate(const Context& context, std::span
     }
 
     ProbabilityReport report;
+    report.execution = std::move(matching.execution);
     report.log_evidence_probability = detail::relativeLogMass(matched, detail::logNormalizer(all_weights));
     detail::CompensatedSum mass, entropy;
     std::size_t selected = 0;

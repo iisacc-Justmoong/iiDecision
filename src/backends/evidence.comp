@@ -1,0 +1,14 @@
+#version 450
+layout(local_size_x = 64) in;
+layout(set=0,binding=0,std430) readonly buffer Values { uint values[]; };
+layout(set=0,binding=1,std430) readonly buffer Query { uint query[]; };
+layout(set=0,binding=2,std430) writeonly buffer Mask { uint mask[]; };
+layout(push_constant) uniform Shape { uint rows; uint columns; } shape;
+void main() {
+    uint r = gl_GlobalInvocationID.x;
+    if (r >= shape.rows) return;
+    uint matched = 1;
+    for (uint c = 0; c < shape.columns; ++c)
+        if (values[r * shape.columns + c] != query[c]) { matched = 0; break; }
+    mask[r] = matched;
+}

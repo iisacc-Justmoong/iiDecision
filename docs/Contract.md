@@ -1,4 +1,4 @@
-# iiDecision 0.0.2 계약
+# iiDecision 0.0.3 계약
 
 의사결정 파이프라인은 `Context → IDecisionMaker → Decision`이다.
 
@@ -18,10 +18,15 @@
 
 소비자는 `IDecisionMaker&`로 판단을 요청하여 구현을 교체할 수 있다.
 
+0.0.x는 개발 중인 계약이며 바이너리 ABI 호환을 보장하지 않는다. 보고서 구조나
+생성자 계약이 바뀐 SDK를 교체할 때 소비 프로젝트도 해당 헤더로 다시 빌드한다.
+
 ## ExactDecisionMaker
 
 - 생성자는 `JointState { candidate_id, observations, log_weight }` 목록을 소유한다.
   모델의 상태는 변경하지 않으며 `evaluate`는 const 조회이다.
+  선택적으로 `std::shared_ptr<EvidenceMatcher>`를 전달하여 실행 경로를 바꾼다.
+  생략하면 프로세스 내 기본 matcher를 공유하며 사용 가능한 가속기를 발견한다.
 - 모든 상태는 같은 관측 키 집합을 사용한다. 키는 비어 있지 않아야 하며 각 상태와
   Context에서 한 번만 나타나야 한다. 값은 범주형 문자열이다.
 - 동일한 후보·관측 조합은 한 번만 선언한다. 생략한 결합 상태의 질량은 0으로

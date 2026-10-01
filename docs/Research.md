@@ -5,13 +5,13 @@
 
 | 공식 자료 | 확인한 개념 | iiDecision의 적용 |
 | --- | --- | --- |
-| [Jev Introduction](https://docs.typesafe.ai/introduction), [Choice](https://docs.typesafe.ai/primitives/choice) | 타입이 정해진 질문과 모든 후보의 확률을 반환한다. | 최소 Decision 계약과 전체 분포 조회를 함께 제공한다. |
-| [Jev Confidence](https://docs.typesafe.ai/confidence) | confidence는 분포에서 계산한 통계이며 전체 분포를 별도로 제공한다. | 엔트로피와 후보 확률을 명시하고 임의의 confidence 공식을 Jev 공식처럼 취급하지 않는다. |
-| [Jev jaggedness](https://docs.typesafe.ai/model-jaggedness/jev-1.13) | 수치 정밀도와 계산의 한계를 설명하며 수학은 코드에서 처리하도록 권한다. | 수치 연산을 C++에서 수행하고 독립적인 고정밀 기준값으로 검증한다. |
-| [pgmpy VariableElimination](https://pgmpy.org/api/generated/inference/pgmpy.inference.VariableElimination.html) | 관측 증거를 조건으로 결합·주변 확률을 조회한다. | 첫 모델은 유한 결합 상태의 전수 합산으로 조건부 주변 확률을 구한다. 그래프 실행기는 도입하지 않는다. |
-| [pyAgrum influence diagram inference](https://pyagrum.readthedocs.io/en/2.2.1/infdiagInference.html) | 증거 기반 추론과 최대 기대 효용을 구분한다. | 최대 확률 선택을 제공하며 효용 최적화와 동일하다고 주장하지 않는다. 효용 정책은 실제 요구가 확인된 뒤 추가한다. |
-| [scikit-learn calibration](https://scikit-learn.org/stable/modules/calibration.html) | Brier·log loss는 calibration만 측정하지 않는다. Reliability diagram은 예측 확률과 관측 빈도를 비교한다. | 정확도, log loss, multiclass Brier, reliability bins와 ECE를 함께 보고한다. |
-| [Inspect scorers](https://inspect.aisi.org.uk/scorers.html), [evaluation logs](https://inspect.aisi.org.uk/eval-logs.html) | 사례별 정답과 채점을 분리하고 실행 설정·결과를 보존한다. | 네이티브 채점 함수와 재현 가능한 Decimal 기준값 검증 기록을 제공한다. Inspect 런타임 의존성은 추가하지 않는다. |
+|[Jev Introduction](https://docs.typesafe.ai/introduction), [Choice](https://docs.typesafe.ai/primitives/choice)| 타입이 정해진 질문과 모든 후보의 확률을 반환한다. | 최소 Decision 계약과 전체 분포 조회를 함께 제공한다. |
+|[Jev Confidence](https://docs.typesafe.ai/confidence)| confidence는 분포에서 계산한 통계이며 전체 분포를 별도로 제공한다. | 엔트로피와 후보 확률을 명시하고 임의의 confidence 공식을 Jev 공식처럼 취급하지 않는다. |
+|[Jev jaggedness](https://docs.typesafe.ai/model-jaggedness/jev-1.13)| 수치 정밀도와 계산의 한계를 설명하며 수학은 코드에서 처리하도록 권한다. | 수치 연산을 C++에서 수행하고 독립적인 고정밀 기준값으로 검증한다. |
+|[pgmpy VariableElimination](https://pgmpy.org/api/generated/inference/pgmpy.inference.VariableElimination.html)| 관측 증거를 조건으로 결합·주변 확률을 조회한다. | 첫 모델은 유한 결합 상태의 전수 합산으로 조건부 주변 확률을 구한다. 그래프 실행기는 도입하지 않는다. |
+|[pyAgrum 영향 다이어그램 추론](https://pyagrum.readthedocs.io/en/2.2.1/infdiagInference.html)| 증거 기반 추론과 최대 기대 효용을 구분한다. | 최대 확률 선택을 제공하며 효용 최적화와 동일하다고 주장하지 않는다. 효용 정책은 실제 요구가 확인된 뒤 추가한다. |
+|[scikit-learn Calibration](https://scikit-learn.org/stable/modules/calibration.html)| Brier·log loss는 calibration만 측정하지 않는다. Reliability diagram은 예측 확률과 관측 빈도를 비교한다. | 정확도, log loss, multiclass Brier, reliability bins와 ECE를 함께 보고한다. |
+|[득점자 검사](https://inspect.aisi.org.uk/scorers.html), [평가 로그](https://inspect.aisi.org.uk/eval-logs.html)| 사례별 정답과 채점을 분리하고 실행 설정·결과를 보존한다. | 네이티브 채점 함수와 재현 가능한 Decimal 기준값 검증 기록을 제공한다. Inspect 런타임 의존성은 추가하지 않는다. |
 
 속도보다 정밀한 계산이 제품 목적이다. 이번 범위는 결정론적인 유한 상태 모델,
 수치 안정성, 전체 확률과 불확실성, 독립 기준값 검증이다. 학습된 자연어 판단 모델,
