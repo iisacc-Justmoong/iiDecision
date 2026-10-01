@@ -1,34 +1,43 @@
-# 검증
+# iiDecision 0.0.1 검증
 
-CTest는 확률 정규화·temperature·큰 logit·동률·단일 선택, 잘못된 파라미터와
-상태, 데이터로부터 선택을 학습하는 동작, 중간 업데이트 이후 실패한 학습의 원자성, 인스턴스 독립성과
-반복 예측의 결정성, LLM 앞단의 분기 예제를 확인한다. Release에서도 검증 조건을
-실행하며 `assert`가 제거되는 컴파일 옵션에 의존하지 않는다.
+## TDD
 
-설치된 CMake 패키지는 SDK 소스 경로를 참조하지 않는 독립 소비자로 검증한다.
-아래 실행은 산출물을 모두 현재 저장소의 `build/` 아래에 둔다.
+공개 계약과 테스트를 먼저 정의하였다. 빈 Decision을 반환하는 임시 구현에서
+다음 두 테스트가 모두 실패하는 것을 확인한 뒤 첫 후보 선택 구현을 완성하였다.
+
+- `FirstCandidateDecisionMaker.SelectsFirstCandidate`: `IDecisionMaker&`로
+  A·B·C를 전달하여 A가 선택되는지 확인한다.
+- `FirstCandidateDecisionMaker.RejectsEmptyCandidates`: 빈 목록이
+  `std::invalid_argument`로 거부되는지 확인한다.
+
+`iiDecision.Example`은 README의 10줄 예제를 컴파일하고 출력 A를 확인한다.
+테스트는 Release에서도 실행되는 명시적 조건 검사를 사용한다.
+
+## 빌드와 설치 패키지
 
 ```sh
-cmake --install build --prefix "$PWD/build/stage"
-cmake -S tests/consumer -B build/consumer/build \
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$PWD/build/stage"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=OFF
+cmake --build build --parallel 2
+ctest --test-dir build --output-on-failure
+cmake --install build --prefix "$PWD/build/contract-stage"
+cmake -S tests/consumer -B build/consumer/build -DCMAKE_BUILD_TYPE=Release -DiiDecision_DIR="$PWD/build/contract-stage/lib/cmake/iiDecision"
 cmake --build build/consumer/build --parallel 2
 ctest --test-dir build/consumer/build --output-on-failure
 ```
 
-기본 빌드는 C++23 표준 라이브러리만 요구한다. macOS에서 통과한 결과는 다른
-플랫폼에서 실행한 증거를 대신하지 않는다. 통계 모델의 실제 품질과 확률 보정은
-제품 데이터로 별도로 평가해야 한다.
+별도 소비 프로젝트는 `find_package(iiDecision 0.0.1 EXACT CONFIG REQUIRED)`와
+`iiDecision::iiDecision`만 사용하여 설치된 공개 헤더와 라이브러리를 검증한다.
+동일한 검증을 `BUILD_SHARED_LIBS=ON`과 `build/contract-shared-stage`에서도 수행한다.
 
-## 0.1.0 검증 기록
+## 실행 결과
 
-2026-10-01, macOS arm64 / Apple Clang 21.0.0 / Release에서 확인한 결과이다.
+2026-10-01 macOS arm64, Release 빌드에서 다음 결과를 확인하였다.
+모든 빌드 및 임시 설치 산출물은 프로젝트의 `build/` 아래에 생성하였다.
 
-- 미구현 상태에서 6개 테스트가 실패함을 확인한 후 구현하였다.
-- 정적 라이브러리: 기본 CTest 6/6, 설치된 패키지 독립 소비자 1/1 통과.
-- 공유 라이브러리: 기본 CTest 6/6, 설치된 패키지 독립 소비자 1/1 통과.
-- SDK 일괄 설치기의 자동 발견 결과: `iiDecision`, 로컬 SDK 의존성 없음.
-- 패키지 검증 설치는 `build/stage`와 `build/shared-stage`에서 수행하였다.
+| 구성 | 전체 빌드 | 단위 테스트 및 예제 | 설치 패키지 소비 테스트 |
+| --- | --- | --- | --- |
+| 정적 라이브러리 | 성공 | 3/3 통과 | 1/1 통과 |
+| 공유 라이브러리 | 성공 | 3/3 통과 | 1/1 통과 |
 
-다른 플랫폼 실행, 실제 업무 데이터 평가, 범용 자연어 판단 모델 학습은 이 기록의
-범위가 아니다.
+README의 C++ 예제가 정확히 10줄이고 컴파일한 예제 파일과 같은 내용임을
+확인하였다. 실제 제품과의 통합은 이번 검증 범위에 포함하지 않는다.
