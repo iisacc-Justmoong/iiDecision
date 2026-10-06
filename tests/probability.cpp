@@ -252,13 +252,14 @@ void evaluationValidation()
 
 int main(int argc, char* argv[])
 {
+    using Test = std::pair<std::string_view, void (*)()>;
     const std::array tests{
-        std::pair{"Prior", prior}, std::pair{"Conditioning", conditioning},
-        std::pair{"Correlation", correlation}, std::pair{"RareEvidence", rareEvidence},
-        std::pair{"LogRange", logRange}, std::pair{"Permutation", permutation},
-        std::pair{"Validation", validation}, std::pair{"ZeroMass", zeroMass},
-        std::pair{"Tie", tie}, std::pair{"Evaluation", evaluation},
-        std::pair{"EvaluationValidation", evaluationValidation},
+        Test{"Prior", prior}, Test{"Conditioning", conditioning},
+        Test{"Correlation", correlation}, Test{"RareEvidence", rareEvidence},
+        Test{"LogRange", logRange}, Test{"Permutation", permutation},
+        Test{"Validation", validation}, Test{"ZeroMass", zeroMass},
+        Test{"Tie", tie}, Test{"Evaluation", evaluation},
+        Test{"EvaluationValidation", evaluationValidation},
     };
     try {
         if (argc == 2) for (const auto& [name, run] : tests) {
