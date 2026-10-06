@@ -1,0 +1,13 @@
+Laya — Convai Innovations
+https://github.com/NandhaKishorM/laya
+Upstream revision: fa9a2a7070b1789912a49ae24603bbfb1a78b001 (laya 0.3.24)
+License: Apache-2.0; the original license is included in LICENSE.
+
+Modifications by iisacc:
+- C++23 port of the typed option rendering, sequence construction, temperature
+  selection, confidence calculation and ONNX decoding contracts from
+  laya/common.py and laya/onnx_agent.py, in src/LayaDecisionMaker.cpp.
+- Package preparation in tools/export_laya.py follows scripts/export_onnx.py.
+
+This notice applies to the adapted Laya backend and does not relicense the
+remaining iiDecision source. Checkpoints are supplied separately by consumers.

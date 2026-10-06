@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Native Hugging Face tokenizer toolchain
+        uses: dtolnay/rust-toolchain@stable
       - name: Linux compute SDKs
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ninja-build libvulkan-dev ocl-icd-opencl-dev mesa-vulkan-drivers pocl-opencl-icd
@@ -30,11 +32,11 @@ jobs:
       - name: Build and test
         shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DIIDECISION_ONNX=ON -DONNXRuntime_ROOT="$ONNXRuntime_ROOT"
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DIIDECISION_ONNX=ON -DONNXRuntime_ROOT="$ONNXRuntime_ROOT" -DIIDECISION_LAYA=ON
           cmake --build build --config Release --parallel 2
           ctest --test-dir build -C Release --output-on-failure
           cmake --install build --config Release --prefix "$PWD/build/stage"
-          cmake -S tests/consumer -B build/consumer/build -DCMAKE_BUILD_TYPE=Release -DiiDecision_DIR="$PWD/build/stage/lib/cmake/iiDecision" -DONNXRuntime_ROOT="$ONNXRuntime_ROOT"
+          cmake -S tests/consumer -B build/consumer/build -DCMAKE_BUILD_TYPE=Release -DiiDecision_DIR="$PWD/build/stage/lib/cmake/iiDecision" -DONNXRuntime_ROOT="$ONNXRuntime_ROOT" -DIIDECISION_CONSUMER_LAYA_PACKAGE="$PWD/build/laya-tests/Typed"
           cmake --build build/consumer/build --config Release --parallel 2
           ctest --test-dir build/consumer/build -C Release --output-on-failure
       - uses: actions/upload-artifact@v4

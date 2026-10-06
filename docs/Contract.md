@@ -1,4 +1,4 @@
-# iiDecision 0.0.3 계약
+# iiDecision 0.0.4 계약
 
 의사결정 파이프라인은 `Context → IDecisionMaker → Decision`이다.
 
@@ -54,3 +54,16 @@
 
 도메인별 행동 실행, LLM 호출과 효용 정책은 소비자가 담당한다. 코어에는
 NPC·Task·Agent·Planner·Memory 타입을 추가하지 않는다.
+
+## LayaDecisionMaker
+
+공식 Laya 모델을 로컬 ONNX 그래프로 실행하는 교체 가능한 `IDecisionMaker`
+구현이다. Context 관측값을 JSON 상태로 직렬화하고 호출 후보를 Choice 옵션으로
+사용한다. 빈 Context도 유효하며 빈 키·중복 키와 빈 후보·중복 후보는 거부한다.
+`evaluate(text,candidates)`는 같은 판단과 전체 학습 분포를 반환한다.
+
+`predict(text,questions)`는 Choice·Score·Noul을 한 배치에서 처리한다. 반환값은
+입력과 독립적으로 질문 ID·옵션 ID·분포·토큰 진단·실행 보고를 소유한다. 동일
+인스턴스의 동시 호출을 허용한다. 모델 로딩 실패나 추론 실패를 기본 행동으로
+대체하지 않는다. 원본 소스와 모델 패키지, 온도와 정밀도의 의미, 지원 범위는
+[Laya 문서](Laya.md)에 정의한다.

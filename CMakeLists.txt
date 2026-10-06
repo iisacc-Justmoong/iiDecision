@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(iiDecision VERSION 0.0.3 LANGUAGES CXX)
+project(iiDecision VERSION 0.0.4 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -29,6 +29,7 @@ add_library(iiDecision
     src/FirstCandidateDecisionMaker.cpp
     src/ExactDecisionMaker.cpp
     src/Evaluation.cpp
+    src/LayaDecisionMaker.cpp
     src/Acceleration.cpp
     src/backends/Mlx.cpp
     src/backends/OpenCl.cpp
@@ -77,6 +78,7 @@ if(NOT IIDECISION_ONNX STREQUAL "OFF")
         message(FATAL_ERROR "ONNX Runtime 1.24+ C/C++ SDK is required; set ONNXRuntime_ROOT")
     endif()
 endif()
+include(cmake/Laya.cmake)
 if(APPLE AND NOT IIDECISION_METAL STREQUAL "OFF")
     enable_language(OBJCXX)
     include(CheckSourceCompiles)
@@ -143,8 +145,18 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/iiDecisionConfig.cmake"
 install(FILES cmake/FindONNXRuntime.cmake DESTINATION "${_package_dir}")
 install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/docs")
+install(DIRECTORY third_party/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/third_party")
+install(FILES tools/export_laya.py DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/tools")
 
 if(BUILD_TESTING)
+    add_executable(iiDecisionLayaTests tests/laya.cpp)
+    target_link_libraries(iiDecisionLayaTests PRIVATE iiDecision::iiDecision)
+    add_executable(iiDecisionLayaParityDriver tests/laya_parity_driver.cpp)
+    target_link_libraries(iiDecisionLayaParityDriver PRIVATE iiDecision::iiDecision)
+    foreach(_case Availability Typed Budgets Validation Concurrency Failures)
+        add_test(NAME "iiDecision.Laya.${_case}" COMMAND iiDecisionLayaTests "${_case}" "${CMAKE_CURRENT_BINARY_DIR}/laya-tests")
+        set_tests_properties("iiDecision.Laya.${_case}" PROPERTIES TIMEOUT 60 SKIP_RETURN_CODE 77)
+    endforeach()
     add_executable(iiDecisionAccelerationTests tests/acceleration.cpp)
     target_link_libraries(iiDecisionAccelerationTests PRIVATE iiDecision::iiDecision)
     foreach(_case Scalar Scheduling Integration)
@@ -178,6 +190,8 @@ if(BUILD_TESTING)
     set_tests_properties(iiDecision.DecimalOracle PROPERTIES TIMEOUT 120)
 endif()
 if(IIDECISION_BUILD_EXAMPLES)
+    add_executable(iiDecisionLayaExample examples/laya.cpp)
+    target_link_libraries(iiDecisionLayaExample PRIVATE iiDecision::iiDecision)
     add_executable(iiDecisionExample examples/first_candidate.cpp)
     target_link_libraries(iiDecisionExample PRIVATE iiDecision::iiDecision)
     add_executable(iiDecisionProbabilityExample examples/probability.cpp)

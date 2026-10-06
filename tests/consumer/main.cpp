@@ -1,10 +1,17 @@
 #include <iiDecision/FirstCandidateDecisionMaker.h>
 #include <iiDecision/Evaluation.h>
+#include <iiDecision/LayaDecisionMaker.h>
 
 #include <array>
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc == 2) {
+        iiDecision::LayaDecisionMaker laya(argv[1]);
+        const std::array questions{iiDecision::LayaQuestion{"action","Choose",iiDecision::LayaQuestionType::Choice,{{"A",""},{"B",""}}}};
+        const auto result = laya.predict("state", questions);
+        if (result.size() != 1 || result[0].decision.candidate_id != "B") return 2;
+    }
     const std::array candidates{iiDecision::Candidate{"A"}, iiDecision::Candidate{"B"}};
     iiDecision::FirstCandidateDecisionMaker implementation;
     iiDecision::IDecisionMaker& maker = implementation;

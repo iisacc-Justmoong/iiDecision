@@ -1,4 +1,35 @@
-# iiDecision 0.0.3 검증
+# iiDecision 0.0.4 검증
+
+## 0.0.4 Laya 백엔드 검증
+
+2026-10-03 macOS arm64에서 다음 결과를 확인하였다. 아래의 0.0.3 기록은
+이전 가속 계층의 검증 이력이며 이번 Laya 그래프 실행과 구분한다.
+
+| 구성 | 빌드와 테스트 | 설치 패키지 소비 테스트 |
+| --- | --- | --- |
+| 기존 가속 SDK 전체와 Laya를 포함한 정적 라이브러리 | 성공, 31/31 통과 | 기존 API와 Laya 2/2 통과 |
+| ONNX와 Laya를 포함한 공유 라이브러리 | 성공, 27개 통과, 제외한 장치 4개 Skipped | 기존 API와 Laya 2/2 통과 |
+| 가속 SDK와 Laya를 제외한 CPU 코어 | 성공, 20개 통과, 제외한 경로 11개 Skipped | 이번 구성에서 별도 설치 소비는 실행하지 않음 |
+
+기존 독립 Decimal oracle 171개 사례도 통과하였다. Laya 테스트는 typed 출력,
+옵션 순서·온도 bucket/clamp·단일 옵션·상태 잘림·literal mask·UTF-8,
+잘못된 질문·패키지·special token·ONNX signature·비유한 logits의 거부,
+동시 호출과 IDecisionMaker 연결을 확인한다. 테스트 전용 작은 ONNX 그래프를
+사용하며 실제 모델 호환 증거는 다음 비교에서 얻는다.
+
+`tests/laya_parity.py`는 공식 루트 체크포인트와 C++ 실행 파일을 직접 실행한다.
+상태 6개, Choice·Score·Noul 응답 18개를 eager Agent·ONNXAgent와 비교하고
+`build/laya-parity.json`을 기록한다. 반올림 전 ONNX 분포와 C++ 분포의 최대 차이는
+`1.1102230246251565e-16`, 4자리 JSON 분포와의 최대 차이는
+`4.5368811903423456e-05`이다. 선택 결과·confidence·기대값·토큰·잘림 수가
+검증 기준을 통과하였다. 단일 선택지의 실제 모델 실행도 완료하였다.
+
+`tools/export_laya.py`로 공식 체크포인트를 비양자화 float32 패키지로 내보내고
+manifest의 파일 5개 SHA-256을 대조하였다. 원본 리비전, 재현 명령과 지원 범위는
+[Laya 문서](Laya.md)에 있다. Linux·Windows·모바일 장치의 Laya 실행,
+multilingual·typed-decisions 체크포인트와 GPU/NPU 그래프 실행은 이번 검증에
+포함하지 않는다. CI에 Cargo 준비와 Laya 테스트를 연결하였으나 원격 CI 실행은
+이번 로컬 결과의 근거로 사용하지 않는다.
 
 ## TDD
 
@@ -41,7 +72,7 @@ cmake --build build/consumer/build --parallel 2
 ctest --test-dir build/consumer/build --output-on-failure
 ```
 
-별도 소비 프로젝트는 `find_package(iiDecision 0.0.3 EXACT CONFIG REQUIRED)`와
+별도 소비 프로젝트는 `find_package(iiDecision 0.0.4 EXACT CONFIG REQUIRED)`와
 `iiDecision::iiDecision`을 사용하여 기존 계약, 가속된 확률 계산과 평가 API를
 검증한다. 가속 SDK를 포함한 구성에서는 해당 SDK 경로도 CMake에 전달한다.
 동일한 검증을 `BUILD_SHARED_LIBS=ON`과 `build/acceleration-shared-stage`에서도

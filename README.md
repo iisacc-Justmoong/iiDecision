@@ -1,27 +1,18 @@
-# iiDecision 0.0.3
+# iiDecision 0.0.4
 
-Context와 여러 Candidate를 받아 하나의 Decision을 반환하는 C++23 의사결정
-라이브러리이다. 소비자는 `IDecisionMaker` 계약을 통해 판단을 요청한다.
-코어 타입은 특정 게임, NPC, 작업 시스템에 의존하지 않는다.
+A C++23 decision-making library that takes a Context and multiple Candidates and returns one Decision. Consumers request a decision through the `IDecisionMaker` contract. The core types do not depend on a particular game, NPC, or task system.
 
-**제품 목적은 빠른 응답보다 정밀한 확률 계산이다.** 유한 결합 상태를 전수 계산하며
-상관관계를 독립으로 가정하거나 작은 확률의 상태를 임의로 제외하지 않는다.
-수치 안정성과 검증 가능성을 처리량과 지연시간보다 우선한다.
+**The product's purpose is precise probability calculation, with priority over fast responses.** It exhaustively calculates finite joint states without assuming that correlations are independent or arbitrarily excluding states with small probabilities. Numerical stability and verifiability take priority over throughput and latency.
 
-최소 `IDecisionMaker`·`Candidate`·`Decision` 계약은 유지한다. `Context`에는
-범주형 관측값을 추가하였으며 빈 `Context{}`도 유효하다. `FirstCandidateDecisionMaker`는
-첫 후보를 반환하고, `ExactDecisionMaker`는 관측 증거의 조건부 확률을 계산한다.
-C++23 코어와 선택적인 네이티브 가속 SDK를 사용한다. Qt 의존성은 없다.
+The minimal `IDecisionMaker`, `Candidate`, and `Decision` contracts are retained. Categorical observations have been added to `Context`, and an empty `Context{}` is also valid. `FirstCandidateDecisionMaker` returns the first candidate, while `ExactDecisionMaker` calculates conditional probabilities given the observed evidence. It uses a C++23 core and optional native acceleration SDKs. There is no Qt dependency.
 
-**정밀도를 유지하는 범위에서 사용 가능한 여러 가속기를 함께 사용한다.**
-Metal·MLX·OpenCL·Vulkan의 직접 실행 경로와 ONNX Runtime의 GPU·NPU 제공자를
-연결하였다. 범주형 증거 비교를 장치에서 수행하며, 로그 질량 합산·조건부 확률·
-엔트로피는 기존 `long double` 계산을 유지한다. 장치 수와 제공자 수를 플랫폼당
-하나로 제한하지 않는다. 실제 실행 경로와 CPU 대체 실행은 보고서에 기록한다.
+**Multiple available accelerators are used together within the bounds of preserving precision.** Direct execution paths for Metal, MLX, OpenCL, and Vulkan, along with GPU and NPU providers from ONNX Runtime, have been connected. Categorical evidence comparisons run on the device, while log-mass summation, conditional probabilities, and entropy retain the existing `long double` calculations. The number of devices and providers is not limited to one per platform. The actual execution path and CPU fallback execution are recorded in the report.
 
-## 10줄 사용 예제
+<a id="10줄-사용-예제"></a>
 
-아래 코드는 [실행 가능한 예제](examples/first_candidate.cpp)와 같으며 `A`를 출력한다.
+## 10-line usage example
+
+The code below is identical to the [executable example](examples/first_candidate.cpp)and prints `A`.
 
 ```cpp
 #include <iiDecision/FirstCandidateDecisionMaker.h>
@@ -36,7 +27,9 @@ int main()
 }
 ```
 
-## 빌드와 테스트
+<a id="빌드와-테스트"></a>
+
+## Build and tests
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
@@ -44,46 +37,38 @@ cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 ```
 
-빌드 산출물은 `build/`에 둔다. 테스트에는 Python 3의 표준 `decimal`을 사용하는
-90자리 독립 기준값 검증이 포함된다. Python은 라이브러리 실행 의존성이 아니다.
-기본값은 정적 라이브러리이며
-`BUILD_SHARED_LIBS=ON`으로 공유 라이브러리를 빌드할 수 있다.
+Build artifacts are placed in `build/`. The tests include verification against independent 90-digit reference values using the standard `decimal` module in Python 3. Python is not a runtime dependency of the library. A static library is the default; a shared library can be built with `BUILD_SHARED_LIBS=ON`.
 
-## CMake 패키지 사용
+<a id="cmake-패키지-사용"></a>
+
+## Using the CMake package
 
 ```cmake
-find_package(iiDecision 0.0.3 CONFIG REQUIRED)
+find_package(iiDecision 0.0.4 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE iiDecision::iiDecision)
 ```
 
-기본 설치 경로는 `~/.local/SDK/iiDecision`이며 `CMAKE_INSTALL_PREFIX` 또는
-`cmake --install build --prefix <경로>`로 바꿀 수 있다. SDK 루트의 일괄 설치기는
-이 프로젝트를 자동 발견한다.
+The default installation path is `~/.local/SDK/iiDecision` and can be changed with `CMAKE_INSTALL_PREFIX` or `cmake --install build --prefix <path>`. The batch installer at the SDK root automatically discovers this project.
 
-## 확률 계산과 평가
+<a id="확률-계산과-평가"></a>
 
-[확률 예제](examples/probability.cpp)는 결합 상태의 로그 가중치와 관측값을 입력한다.
-`ExactDecisionMaker::evaluate`는 모든 후보의 확률·로그 확률, 선택 결과, 증거의
-로그 확률, 엔트로피, 정규화 잔차, 선형 확률의 underflow 개수를 반환한다.
-`decide`는 동일한 계산의 선택 결과만 기존 계약으로 반환한다.
+## Probability calculation and evaluation
+
+The [probability example](examples/probability.cpp)takes the joint states' log weights and observations as input. `ExactDecisionMaker::evaluate` returns all candidates' probabilities and log probabilities, the selection result, the log probability of the evidence, entropy, the normalization residual, and the number of linear-probability underflows. `decide` returns only the selection result from the same calculation through the existing contract.
 
 ```cpp
 const iiDecision::Context context{{{"signal", "yes"}}};
 const auto prediction = maker.evaluate(context, candidates);
-// prediction.probabilities에는 선택되지 않은 후보도 모두 존재한다.
+// prediction.probabilities also contains every unselected candidate.
 ```
 
-`evaluatePredictions`는 정답이 있는 평가 사례에서 정확도, log loss, multiclass
-Brier score, reliability bins, ECE와 사례별 점수를 계산한다. 학습이나 임계값
-조정에 사용한 데이터와 별도의 평가 데이터를 사용해야 한다.
+`evaluatePredictions` calculates accuracy, log loss, multiclass Brier score, reliability bins, ECE, and per-case scores for evaluation cases with ground-truth answers. Evaluation data separate from the data used for training or threshold adjustment must be used.
 
-전수 계산의 exact는 추론 알고리즘의 의미이다. 숫자는 `long double` 부동소수점이며
-플랫폼별 실제 가수 비트 수는 `probability_mantissa_bits`로 확인한다. 임의 정밀도
-계산이나 실제 정답률 보장을 뜻하지 않는다. 로그 확률은 선형 확률이 underflow하는
-경우에도 보존한다. 분포의 집중도와 수치 잔차는 실제 데이터에서의 calibration과
-구분한다.
+The term exact in exhaustive calculation refers to the inference algorithm. Numbers are represented in `long double` floating point, and the actual number of mantissa bits on each platform is reported by `probability_mantissa_bits`. This does not mean arbitrary-precision calculation or a guarantee of real-world accuracy. Log probabilities are preserved even when linear probabilities underflow. Distribution concentration and numerical residuals are distinguished from calibration on real data.
 
-## 네이티브 하드웨어 가속
+<a id="네이티브-하드웨어-가속"></a>
+
+## Native hardware acceleration
 
 ```cpp
 auto hardware = std::make_shared<iiDecision::EvidenceMatcher>();
@@ -94,21 +79,39 @@ for (const auto& run : prediction.execution.records) {
 }
 ```
 
-기본값은 발견한 가속기들에 상태 행을 분배하여 동시에 실행한다. 실패한 구간은
-CPU로 계산하고 실패 원인을 기록한다. CPU 대체 실행을 금지하려면
-`AccelerationOptions::mode = ExecutionMode::RequireAccelerators`를 사용한다.
-가속기 선택·제공자 옵션·플러그인 등록·플랫폼별 준비 방법과 확인된 한계는
-[가속 문서](docs/Acceleration.md)에 설명하였다.
+By default, state rows are distributed across the discovered accelerators and executed concurrently. Failed ranges are calculated on the CPU, and the causes of failure are recorded. To prohibit CPU fallback execution, use `AccelerationOptions::mode = ExecutionMode::RequireAccelerators`. Accelerator selection, provider options, plugin registration, platform-specific preparation, and verified limitations are described in
+the [acceleration document](docs/Acceleration.md).
 
-CMake 옵션 `IIDECISION_METAL`, `IIDECISION_MLX`, `IIDECISION_OPENCL`,
-`IIDECISION_VULKAN`, `IIDECISION_ONNX`는 각각 `AUTO`·`ON`·`OFF`이다.
-기본 `AUTO`는 설치된 SDK를 발견하여 빌드에 포함하며, `ON`은 SDK가 없으면
-구성을 실패시킨다. SDK가 없는 플랫폼에서도 CPU 코어를 빌드할 수 있다.
-ONNX Runtime은 `ONNXRuntime_ROOT`, MLX는 `MLX_DIR`로 C++ SDK 경로를 지정한다.
-Python 바인딩은 런타임 의존성에 포함하지 않는다.
+The CMake options `IIDECISION_METAL`, `IIDECISION_MLX`, `IIDECISION_OPENCL`, `IIDECISION_VULKAN`, and `IIDECISION_ONNX` each accept `AUTO`, `ON`, or `OFF`. The default `AUTO` discovers installed SDKs and includes them in the build; `ON` makes configuration fail if the SDK is absent. The CPU core can also be built on platforms without these SDKs. Specify the C++ SDK paths with `ONNXRuntime_ROOT` for ONNX Runtime and `MLX_DIR` for MLX. Python bindings are not included as runtime dependencies.
 
-입출력과 수명 규칙은 [계약 문서](docs/Contract.md), 수식과 정밀도 정책은
-[확률 모델 문서](docs/Probability.md), 문서 검토와 채택 이유는
-[자료 검토 문서](docs/Research.md), TDD 및 패키지 검증은
-[검증 문서](docs/Verification.md)에 정의한다. 이 저장소에는 별도 사용 허락
-라이선스를 부여하지 않았다.
+## Laya model backend
+
+`LayaDecisionMaker` adds local compatibility with the official [Laya decision model](https://huggingface.co/convaiinnovations/laya).
+It selects actions from a supplied state and options through the existing `IDecisionMaker` contract, and also exposes
+typed `Choice`, `Score`, and `Noul` questions in a single ONNX forward pass. This learned model backend is separate
+from exhaustive finite-state probability inference.
+
+```cpp
+#include <iiDecision/LayaDecisionMaker.h>
+#include <array>
+
+iiDecision::LayaDecisionMaker maker("local-laya-package");
+const std::array questions{
+    iiDecision::LayaQuestion{"route", "Choose the next action.",
+        iiDecision::LayaQuestionType::Choice,
+        {{"refund", "Issue a refund"}, {"support", "Provide technical support"}}}
+};
+const auto answers = maker.predict("The customer reports an application crash.", questions);
+```
+
+`IIDECISION_LAYA=AUTO|ON|OFF` controls the backend. It needs the ONNX Runtime C++ SDK and Cargo at build time;
+the native Hugging Face tokenizer archive is included in the installed CMake package. Inference uses local
+ONNX Runtime CPU execution without Qt, Python, or a hosted service. The checkpoint must first be exported
+using `tools/export_laya.py`; Python and the pinned official `laya==0.3.24` package are preparation tools only.
+See [Laya compatibility and model preparation](docs/Laya.md) for the input contract, token budgets,
+temperature scaling, upstream attribution, and the verified scope.
+
+I/O and lifetime rules are defined in the [contract document](docs/Contract.md); formulas and precision policies in
+the [probability-model document](docs/Probability.md); the review of materials and reasons for adoption in
+the [research-review document](docs/Research.md); and TDD and package verification in
+the [verification document](docs/Verification.md). This repository has not been granted a separate license permitting its use.
