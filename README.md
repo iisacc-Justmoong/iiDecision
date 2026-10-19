@@ -1,4 +1,9 @@
-# iiDecision 0.0.4
+# iiDecision 0.0.5
+
+Package release: **0.0.5** (2026-10-19). This patch packages the current
+source snapshot; build, test and installation evidence is recorded in the SDK
+patch-release report. Earlier versioned feature notes remain historical.
+
 
 A C++23 decision-making library that takes a Context and multiple Candidates and returns one Decision. Consumers request a decision through the `IDecisionMaker` contract. The core types do not depend on a particular game, NPC, or task system.
 
@@ -44,7 +49,7 @@ Build artifacts are placed in `build/`. The tests include verification against i
 ## Using the CMake package
 
 ```cmake
-find_package(iiDecision 0.0.4 CONFIG REQUIRED)
+find_package(iiDecision 0.0.5 CONFIG REQUIRED)
 target_link_libraries(my_app PRIVATE iiDecision::iiDecision)
 ```
 

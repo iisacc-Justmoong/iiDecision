@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(iiDecision VERSION 0.0.4 LANGUAGES CXX)
+project(iiDecision VERSION 0.0.5 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
