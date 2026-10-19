@@ -165,5 +165,7 @@ MoltenVK 1.4.2 및 현재 Xcode Metal SDK이다. MLX wheel의 CMake 설정에 �
 CoreML 제공자 배정은 확인하였으나 ANE 배치는 확인하지 않았다. iOS는 크로스
 빌드 증거이며 기기 실행 증거는 아니다. Windows·Linux·Android와 NVIDIA·AMD·
 Intel·Qualcomm·Huawei·Rockchip·FPGA 등의 물리 장치 실행은 현재 환경에서
-확인하지 않았다. 수동 GitHub Actions에는 데스크톱 빌드·테스트 및 Android·iOS
+확인하지 않았다. Laya 동시 추론 테스트의 보조 함수는 MSVC PPL의
+`concurrency` 매크로 및 `Concurrency` 네임스페이스와 겹치지 않는 이름을 사용한다.
+수동 GitHub Actions에는 데스크톱 빌드·테스트 및 Android·iOS
 빌드를 정의하였으며 이번 작업에서 호스팅 실행을 수행하지 않았다.

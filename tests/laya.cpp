@@ -112,7 +112,7 @@ void validation(const std::filesystem::path& path) {
     rejects<std::invalid_argument>([&]{maker.decide(Context{{{"x","a"},{"x","b"}}},std::array{Candidate{"A"}});});
     rejects<std::invalid_argument>([&]{maker.evaluate("",{});});
 }
-void concurrency(const std::filesystem::path& path) {
+void verifyConcurrentInference(const std::filesystem::path& path) {
     LayaDecisionMaker maker(path);
     std::vector<std::future<void>> workers;
     for(int i=0;i<4;++i) workers.push_back(std::async(std::launch::async,[&]{for(int j=0;j<10;++j)
@@ -153,7 +153,7 @@ int main(int argc,char** argv) {
         if(name=="Typed") typed(path);
         else if(name=="Budgets") budgets(path);
         else if(name=="Validation") validation(path);
-        else if(name=="Concurrency") concurrency(path);
+        else if(name=="Concurrency") verifyConcurrentInference(path);
         else if(name=="Failures") failures(path);
         else throw std::runtime_error("unknown test");
         return 0;
