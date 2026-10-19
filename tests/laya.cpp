@@ -1,5 +1,8 @@
 #include <iiDecision/LayaDecisionMaker.h>
 #include "backends/OnnxModel.h"
+#ifdef IIDECISION_TEST_ORT_API_VERSION
+#include <onnxruntime_c_api.h>
+#endif
 
 #include <array>
 #include <bit>
@@ -145,6 +148,9 @@ int main(int argc,char** argv) {
         check(argc==3,"test case and scratch directory are required");
         const std::string name=argv[1];
         if(name=="Availability") {
+#ifdef IIDECISION_TEST_ORT_API_VERSION
+            check(OrtGetApiBase()->GetApi(IIDECISION_TEST_ORT_API_VERSION)!=nullptr,"The loaded ONNX DLL must support the compiled SDK API version");
+#endif
             if(!LayaDecisionMaker::available()) rejects<std::runtime_error>([]{LayaDecisionMaker maker("missing");});
             return 0;
         }

@@ -151,6 +151,10 @@ install(FILES tools/export_laya.py DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecis
 if(BUILD_TESTING)
     add_executable(iiDecisionLayaTests tests/laya.cpp)
     target_link_libraries(iiDecisionLayaTests PRIVATE iiDecision::iiDecision)
+    if(IIDECISION_HAS_ONNX)
+        target_link_libraries(iiDecisionLayaTests PRIVATE ONNXRuntime::ONNXRuntime)
+        target_compile_definitions(iiDecisionLayaTests PRIVATE IIDECISION_TEST_ORT_API_VERSION=${ONNXRuntime_API_VERSION})
+    endif()
     add_executable(iiDecisionLayaParityDriver tests/laya_parity_driver.cpp)
     target_link_libraries(iiDecisionLayaParityDriver PRIVATE iiDecision::iiDecision)
     foreach(_case Availability Typed Budgets Validation Concurrency Failures)
@@ -206,4 +210,17 @@ if(IIDECISION_BUILD_EXAMPLES)
         set_tests_properties(iiDecision.ProbabilityExample PROPERTIES
             TIMEOUT 20 PASS_REGULAR_EXPRESSION "selected=A")
     endif()
+endif()
+
+if(WIN32 AND IIDECISION_HAS_ONNX)
+    # System32 can contain an older Windows ML runtime and is searched before
+    # PATH. Stage the matching SDK DLL beside every native test/tool.
+    get_property(_decision_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(_decision_target IN LISTS _decision_targets)
+        get_target_property(_decision_type "${_decision_target}" TYPE)
+        if(_decision_type STREQUAL "EXECUTABLE")
+            onnxruntime_deploy("${_decision_target}")
+        endif()
+    endforeach()
+    install(FILES "${ONNXRuntime_RUNTIME}" DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

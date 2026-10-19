@@ -15,9 +15,26 @@ endif()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ONNXRuntime REQUIRED_VARS ONNXRuntime_INCLUDE_DIR ONNXRuntime_LIBRARY _onnx_version_ok)
 if(ONNXRuntime_FOUND AND NOT TARGET ONNXRuntime::ONNXRuntime)
-    add_library(ONNXRuntime::ONNXRuntime UNKNOWN IMPORTED)
-    set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES
-        IMPORTED_LOCATION "${ONNXRuntime_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${ONNXRuntime_INCLUDE_DIR}")
+    if(WIN32)
+        find_file(ONNXRuntime_RUNTIME NAMES onnxruntime.dll
+            HINTS "${ONNXRuntime_ROOT}" ENV ONNXRuntime_ROOT PATH_SUFFIXES lib bin NO_DEFAULT_PATH)
+        if(NOT ONNXRuntime_RUNTIME)
+            message(FATAL_ERROR "ONNX Runtime's matching Windows DLL is required")
+        endif()
+        add_library(ONNXRuntime::ONNXRuntime SHARED IMPORTED)
+        set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES
+            IMPORTED_IMPLIB "${ONNXRuntime_LIBRARY}" IMPORTED_LOCATION "${ONNXRuntime_RUNTIME}")
+    else()
+        add_library(ONNXRuntime::ONNXRuntime UNKNOWN IMPORTED)
+        set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES IMPORTED_LOCATION "${ONNXRuntime_LIBRARY}")
+    endif()
+    set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ONNXRuntime_INCLUDE_DIR}")
+endif()
+if(WIN32 AND ONNXRuntime_FOUND)
+    function(onnxruntime_deploy target)
+        add_custom_command(TARGET "${target}" POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:ONNXRuntime::ONNXRuntime>"
+                "$<TARGET_FILE_DIR:${target}>" VERBATIM)
+    endfunction()
 endif()
 mark_as_advanced(ONNXRuntime_INCLUDE_DIR ONNXRuntime_LIBRARY)
