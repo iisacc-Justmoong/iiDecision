@@ -122,3 +122,11 @@ I/O and lifetime rules are defined in the [contract document](docs/Contract.md);
 the [probability-model document](docs/Probability.md); the review of materials and reasons for adoption in
 the [research-review document](docs/Research.md); and TDD and package verification in
 the [verification document](docs/Verification.md). This repository has not been granted a separate license permitting its use.
+
+## License
+
+SPDX-License-Identifier: MIT
+
+The original code and documentation in this repository are licensed under the
+[MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model
+weights retain their respective licenses.
