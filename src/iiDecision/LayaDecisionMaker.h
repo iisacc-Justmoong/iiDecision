@@ -44,6 +44,7 @@ struct LayaAnswer {
     std::size_t input_tokens = 0;
     std::size_t state_tokens = 0;
     std::size_t state_tokens_dropped = 0;
+    std::size_t head_tokens_dropped = 0; // Instruction/option tokens removed by head and option limits.
     std::size_t options_distinct = 0; // After the upstream per-option token cap.
     ExecutionReport execution;
 };

@@ -118,10 +118,36 @@ using `tools/export_laya.py`; Python and the pinned official `laya==0.3.24` pack
 See [Laya compatibility and model preparation](docs/Laya.md) for the input contract, token budgets,
 temperature scaling, upstream attribution, and the verified scope.
 
+## Evidence-aware RAG decisions
+
+`RagDecisionGate` converts relevance and answerability judgments into `Answer`,
+`RetrySearch`, or `Escalate`. Text and image evidence have separate runtime thresholds.
+Accepted evidence is ranked, merged into unique document/page citations, and bounded
+by a page budget. Reports retain every candidate, rejection reason, and policy revision.
+`run` performs at most one expanded retrieval before escalation.
+
+```cpp
+#include <iiDecision/RagDecisionGate.h>
+#include <array>
+
+const std::array evidence{
+    iiDecision::RagEvidence{"passage", "guide", 17,
+        iiDecision::EvidenceModality::Text, 0.9L, 0.95L}
+};
+const auto report = iiDecision::RagDecisionGate{}.evaluate(evidence);
+// report.action == iiDecision::RagAction::Answer; cite report.pages.
+```
+
+`LayaEvidenceScorer` runs two Noul judgments per text passage in one local forward
+pass, retains the full model diagnostics, and marks truncated passages or scoring criteria as incomplete
+so they cannot authorize generation. Image evidence requires scores from a separate
+image-capable model. The gate adds no Qt, network, or model dependency; thresholds
+require validation on representative labeled data. See the [RAG contract and examples](docs/AgenticRag.md).
+
 I/O and lifetime rules are defined in the [contract document](docs/Contract.md); formulas and precision policies in
 the [probability-model document](docs/Probability.md); the review of materials and reasons for adoption in
 the [research-review document](docs/Research.md); and TDD and package verification in
-the [verification document](docs/Verification.md). This repository has not been granted a separate license permitting its use.
+the [verification document](docs/Verification.md).
 
 ## License
 

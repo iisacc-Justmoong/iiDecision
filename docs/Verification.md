@@ -1,4 +1,69 @@
-# iiDecision 0.0.4 검증
+# iiDecision 0.0.5 검증
+
+## 2026-10-23 근거 정책과 Laya 채점
+
+macOS arm64의 최종 Release 정적 빌드에서 다음 결과를 확인하였다.
+
+| 검증 | 결과 |
+| --- | --- |
+| CMake 전체 빌드 | 성공 |
+| 전체 CTest 42개 | 41개 통과, MLX 1개 Skipped, 실패 0개 |
+| 새 근거 정책·채점 테스트 | 10/10 통과 |
+| vendor 의존성 없는 정책 엔진, ASan·UBSan | 7/7 통과 |
+| telemetry 변경 후 Laya 통합 반복 | 5/5 통과 |
+| 스테이징 설치 후 별도 CMake 소비 프로젝트 | 기존 API·근거 정책·Laya 채점, 2/2 통과 |
+| 기존 Decimal oracle | 171개 사례 통과 |
+
+스테이징 경로는 `build/verification/agentic-rag-20261023/stage`이다. 소비 프로젝트는
+스테이징 헤더와 라이브러리를 `find_package(iiDecision 0.0.5 EXACT)`로 찾는다.
+사용자 `~/.local` 설치본을 교체한 결과는 아니다. Windows·Linux 실행, 공유 라이브러리
+구성 및 제품 앱 통합은 이번 검증에 포함하지 않는다.
+
+`tests/rag.cpp`의 7개 사례와 `tests/laya.cpp`의 근거 관련 3개 사례를 추가하였다.
+초기 미구현 상태에서 10개 모두 실패한 뒤 통과하였다. 문단이 전부 들어가더라도
+질문·판정 기준만 잘리는 경계는 추가 실패를 먼저 재현한 뒤 head 토큰 진단과
+제외 정책으로 수정하였다. 관련성만 높은 근거, 서로 다른 후보의 점수 혼합,
+매체별 임계값, 문서·페이지 인용 병합, 페이지 예산, 정렬·동률, 임계값 바로 아래의
+`long double`, NaN·무한대·중복·잘못된 열거형, 재검색 횟수와 예외 전파,
+소유권과 동시 조회, Noul 채점과 입력 잘림을 검증한다.
+
+정책 엔진은 vendor 라이브러리 없이 C++23으로 별도 빌드하여 7개 테스트를
+AddressSanitizer·UndefinedBehaviorSanitizer와 함께 통과하였다. Laya 작은
+ONNX fixture는 한 문단의 질문 두 개가 같은 forward pass에서 실행되는지,
+점수와 원본 분포·실행 기록이 대응하는지 확인한다. fixture의 점수는 모델의
+실세계 정확도 근거가 아니다.
+
+첫 검증 중 ONNX Runtime 1.30 macOS의 telemetry 종료 경로에서
+`recursive_mutex lock failed`가 한 번 관측되었다. macOS crash report의
+`PosixTelemetry::Shutdown`과 Microsoft Events 스택을 확인하고 두 ORT 환경에서
+telemetry를 비활성화하였다. 변경 후 해당 Laya 통합 테스트를 5회 연속 통과하였다.
+진단 요약은 `build/verification/agentic-rag-20261023/onnx-telemetry-diagnostic.json`이다.
+
+기존 로컬 루트 Laya 체크포인트로 실제 텍스트 채점을 실행하였다. 환불 기간 질문의
+정답 문단은 관련성 약 `0.8197`, 답변 가능성 약 `0.7906`, 무관한 문단은 각각
+약 `0.00483`, `0.00668`이었다. 기본 답변 가능성 임계값 `0.8`에서는 정답 문단도
+재검색 대상이 된다. 이 두 문단은 실행 확인 사례이며 threshold calibration이나
+정답 데이터셋에 대한 정확도 개선 증거가 아니다. 이미지 모델 실행이나 원문의
+75개 질문 평가를 재현하였다고 주장하지 않는다.
+
+이번 구성에서는 기존 설치 MLX CMake 패키지의 `iiFileProvider::Native` 참조가
+해결되지 않아 `IIDECISION_MLX=OFF`로 검증하였다. 다른 활성 백엔드는 Metal,
+OpenCL, Vulkan, ONNX와 Laya이다. 해당 환경 문제를 iiDecision의 RAG 변경으로
+수정하거나 MLX 실행 성공으로 처리하지 않았다.
+
+재현 명령은 다음과 같다. 기존 로컬 ONNX·Vulkan 경로 등은 CMake cache에서
+유지한다. 모든 산출물은 프로젝트 `build/` 안에 둔다.
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DIIDECISION_MLX=OFF
+cmake --build build --parallel 2
+ctest --test-dir build --output-on-failure
+./build/iiDecisionRagExample
+./build/iiDecisionRagExample build/models/laya
+```
+
+TDD 실패·통과, 전체 회귀, 독립 sanitizer 빌드·실행, 실제 모델 채점과
+스테이징 설치 소비 로그는 `build/verification/agentic-rag-20261023/`에 보존한다.
 
 ## 0.0.4 Laya 백엔드 검증
 

@@ -110,6 +110,9 @@ head 예산이 부족하면 공식 per-option 제한과 instructions 제한을 �
 바꿀 수 있다. 마커가 전체 길이에 들어가지 않으면 오류이며 첫 후보로 대체하지 않는다.
 
 `state_tokens`, `state_tokens_dropped`는 모델이 읽은 상태의 범위를 보여준다.
+`head_tokens_dropped`는 질문 지시문과 선택지 설명이 head·옵션 토큰 제한으로
+줄어든 양이다. 0이 아니면 원래 정의한 판정 기준을 모두 읽지 못한 것이다.
+RAG 채점기는 상태 또는 head 잘림이 있으면 불완전한 근거로 제외한다.
 `options_distinct`가 옵션 수보다 작으면 잘림 이후 선택지의 토큰 표현이 겹친다.
 각 질문의 `input_tokens`에는 패딩을 제외한 실제 입력 토큰 수가 기록된다.
 

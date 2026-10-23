@@ -1,5 +1,26 @@
 # 문서 검토와 설계 결정
 
+## 2026-10-23 근거 평가와 행동 정책
+
+[Build a Jev-powered Agentic RAG](https://blog.dailydoseofds.com/p/build-a-jev-powered-agentic-rag)의
+본문을 읽고 관련성과 답변 가능성의 구분, 매체별 임계값, 동일 페이지 검색 결과의
+병합, 1회 확장 검색 후 사람에게 이관하는 흐름과 판단 기록을 채택하였다.
+글은 Jev를 개념으로 설명하고 실제 예제에는 Liquid AI d1-3B를 사용한다.
+제시된 성능 수치는 해당 글의 결과이며 iiDecision의 성능 증거가 아니다.
+
+[TypeSafe Noul](https://docs.typesafe.ai/primitives/noul)과
+[Introduction](https://docs.typesafe.ai/introduction)을 다시 확인하였다. 각 조건은
+독립된 typed 질문으로 묻고 코드를 통해 결합한다. Noul의 `P(true)`는 yes/no
+판단의 확률이며 분포 집중도나 관련성의 정도와 혼용하지 않는다.
+
+iiDecision에는 `RagDecisionGate`와 기존 Laya를 사용하는 텍스트 채점기를 추가한다.
+정밀 확률 추론과 학습 모델의 의미를 보존하고 외부 서비스·에이전트 프레임워크를
+도입하지 않는다. 문단별 답변 가능성을 통과해야 인용을 합치므로 여러 실패 후보가
+서로 부족한 점수를 보완하는 오류를 방지한다. 구체적인 정책과 검증 범위는
+[AgenticRag.md](AgenticRag.md)와 [Verification.md](Verification.md)에 있다.
+
+## 2026-10-01 초기 확률 코어
+
 2026-10-01 공식 문서를 검토하였다. 아래 표의 설계 결정은 iiDecision을 위한
 판단이며 해당 도구의 전체 구현이나 모델을 복제한다는 의미가 아니다.
 

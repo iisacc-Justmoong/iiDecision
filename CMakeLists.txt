@@ -29,6 +29,8 @@ add_library(iiDecision
     src/FirstCandidateDecisionMaker.cpp
     src/ExactDecisionMaker.cpp
     src/Evaluation.cpp
+    src/RagDecisionGate.cpp
+    src/LayaEvidenceScorer.cpp
     src/LayaDecisionMaker.cpp
     src/Acceleration.cpp
     src/backends/Mlx.cpp
@@ -149,6 +151,12 @@ install(DIRECTORY third_party/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/
 install(FILES tools/export_laya.py DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/tools")
 
 if(BUILD_TESTING)
+    add_executable(iiDecisionRagTests tests/rag.cpp)
+    target_link_libraries(iiDecisionRagTests PRIVATE iiDecision::iiDecision)
+    foreach(_case Answerability Multimodal Ranking Boundaries Workflow Validation Ownership)
+        add_test(NAME "iiDecision.Rag.${_case}" COMMAND iiDecisionRagTests "${_case}")
+        set_tests_properties("iiDecision.Rag.${_case}" PROPERTIES TIMEOUT 30)
+    endforeach()
     add_executable(iiDecisionLayaTests tests/laya.cpp)
     target_link_libraries(iiDecisionLayaTests PRIVATE iiDecision::iiDecision)
     if(IIDECISION_HAS_ONNX)
@@ -157,7 +165,7 @@ if(BUILD_TESTING)
     endif()
     add_executable(iiDecisionLayaParityDriver tests/laya_parity_driver.cpp)
     target_link_libraries(iiDecisionLayaParityDriver PRIVATE iiDecision::iiDecision)
-    foreach(_case Availability Typed Budgets Validation Concurrency Failures)
+    foreach(_case Availability Typed Budgets Validation Concurrency Failures Evidence EvidenceTruncation EvidenceValidation)
         add_test(NAME "iiDecision.Laya.${_case}" COMMAND iiDecisionLayaTests "${_case}" "${CMAKE_CURRENT_BINARY_DIR}/laya-tests")
         set_tests_properties("iiDecision.Laya.${_case}" PROPERTIES TIMEOUT 60 SKIP_RETURN_CODE 77)
     endforeach()
@@ -194,6 +202,8 @@ if(BUILD_TESTING)
     set_tests_properties(iiDecision.DecimalOracle PROPERTIES TIMEOUT 120)
 endif()
 if(IIDECISION_BUILD_EXAMPLES)
+    add_executable(iiDecisionRagExample examples/rag.cpp)
+    target_link_libraries(iiDecisionRagExample PRIVATE iiDecision::iiDecision)
     add_executable(iiDecisionLayaExample examples/laya.cpp)
     target_link_libraries(iiDecisionLayaExample PRIVATE iiDecision::iiDecision)
     add_executable(iiDecisionExample examples/first_candidate.cpp)
@@ -203,6 +213,9 @@ if(IIDECISION_BUILD_EXAMPLES)
     add_executable(iiDecisionAccelerationExample examples/acceleration.cpp)
     target_link_libraries(iiDecisionAccelerationExample PRIVATE iiDecision::iiDecision)
     if(BUILD_TESTING)
+        add_test(NAME iiDecision.RagExample COMMAND iiDecisionRagExample)
+        set_tests_properties(iiDecision.RagExample PROPERTIES
+            TIMEOUT 30 PASS_REGULAR_EXPRESSION "citation=guide:17")
         add_test(NAME iiDecision.Example COMMAND iiDecisionExample)
         set_tests_properties(iiDecision.Example PROPERTIES
             TIMEOUT 20 PASS_REGULAR_EXPRESSION "^A")

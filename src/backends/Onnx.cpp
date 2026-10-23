@@ -33,6 +33,7 @@ using Options = std::unordered_map<std::string,std::string>;
 struct Environment {
     Ort::Env env{ORT_LOGGING_LEVEL_ERROR,"iiDecision"};
     std::vector<std::string> plugins;
+    Environment() { env.DisableTelemetryEvents(); }
     ~Environment() {
         for (auto it = plugins.rbegin(); it != plugins.rend(); ++it)
             try { env.UnregisterExecutionProviderLibrary(it->c_str()); } catch (...) {}

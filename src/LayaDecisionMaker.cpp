@@ -62,7 +62,7 @@ std::string utf8(const std::filesystem::path& path) {
 }
 struct Encoded {
     std::vector<std::int64_t> ids,markers;
-    std::size_t state_tokens=0,state_dropped=0,distinct=0;
+    std::size_t state_tokens=0,state_dropped=0,head_dropped=0,distinct=0;
 };
 constexpr const char* inputNames[]{"input_ids","attention_mask","marker_pos","marker_mask","qtype"};
 constexpr const char* outputNames[]{"logits","act_logits"};
@@ -76,6 +76,9 @@ struct LayaDecisionMaker::Impl {
     std::size_t max_length=0,head_length=0;
 
     Impl(const std::filesystem::path& package,LayaOptions settings):options(std::move(settings)) {
+        // Local inference does not need runtime telemetry. ORT 1.30's POSIX
+        // telemetry worker can race its own static shutdown on macOS.
+        env.DisableTelemetryEvents();
         if(options.intra_op_threads<1 || blank(options.instructions))
             throw std::invalid_argument("Laya needs positive thread count and nonempty decision instructions");
         char* error=nullptr;
@@ -142,15 +145,17 @@ struct LayaDecisionMaker::Impl {
     Encoded assemble(std::span<const std::int64_t> state,const LayaQuestion& q) const {
         const char* types[]{"choice","score","noul"};
         auto head=encode(std::string(types[static_cast<int>(q.type)])+" question: "+q.instructions);
+        const auto original_head=head.size();
         std::vector<std::vector<std::int64_t>> options;
-        std::size_t total=0;
+        std::size_t total=0,original_options=0;
         for(std::size_t i=0;i<q.options.size();++i) {
             const auto& o=q.options[i]; std::string text;
             if(q.type==LayaQuestionType::Score) text="level "+std::to_string(i)+": "+o.description;
             else if(q.type==LayaQuestionType::Noul) text=o.id+": "+(o.description.empty() ?
                 (i==0 ? "no, the statement does not hold":"yes, the statement holds") : o.description);
             else text=o.id+(o.description.empty() ? "":": "+o.description);
-            auto tokens=encode(" "+text); if(tokens.size()>48) tokens.resize(48);
+            auto tokens=encode(" "+text); original_options+=tokens.size();
+            if(tokens.size()>48) tokens.resize(48);
             tokens.insert(tokens.begin(),special[3]); total+=tokens.size(); options.push_back(std::move(tokens));
         }
         auto budget=static_cast<std::int64_t>(head_length)-static_cast<std::int64_t>(total);
@@ -163,6 +168,7 @@ struct LayaDecisionMaker::Impl {
         const auto cap=static_cast<std::size_t>(std::max<std::int64_t>(8,budget));
         if(head.size()>cap) head.resize(cap);
         Encoded row; row.ids.push_back(special[0]); row.ids.insert(row.ids.end(),head.begin(),head.end()); row.ids.push_back(special[1]);
+        row.head_dropped=original_head-head.size()+original_options-(total-options.size());
         std::set<std::vector<std::int64_t>> distinct;
         for(const auto& o:options) {
             distinct.insert(o); row.markers.push_back(static_cast<std::int64_t>(row.ids.size())); row.ids.insert(row.ids.end(),o.begin(),o.end());
@@ -257,6 +263,7 @@ struct LayaDecisionMaker::Impl {
             answer.act_probability=std::exp(static_cast<long double>(act[r*act_count])-act_max)/act_sum;
             answer.input_tokens=rows[r].ids.size(); answer.state_tokens=rows[r].state_tokens;
             answer.state_tokens_dropped=rows[r].state_dropped; answer.options_distinct=rows[r].distinct;
+            answer.head_tokens_dropped=rows[r].head_dropped;
             answer.execution.cpu_rows=batch; answer.execution.records.push_back({"laya/onnx/CPUExecutionProvider",0,batch,true,{}});
             results.push_back(std::move(answer));
         }

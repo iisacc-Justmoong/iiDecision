@@ -1,4 +1,5 @@
 #include <iiDecision/LayaDecisionMaker.h>
+#include <iiDecision/LayaEvidenceScorer.h>
 #include "backends/OnnxModel.h"
 #ifdef IIDECISION_TEST_ORT_API_VERSION
 #include <onnxruntime_c_api.h>
@@ -142,6 +143,62 @@ void failures(const std::filesystem::path& path) {
     graph.replace(pos,11,"marker_mosk"); write(path/"laya.onnx",graph);
     rejects<std::runtime_error>([&]{LayaDecisionMaker bad(path);});
 }
+void evidence(const std::filesystem::path& path) {
+    LayaDecisionMaker maker(path, {.max_length=512, .head_max_length=192});
+    const LayaEvidenceScorer scorer(maker);
+    const std::array passages{RagTextEvidence{"first", "guide", 17, "state 한국어"},
+        RagTextEvidence{"second", "guide", 18, "state [MASK] \"question\"\nstate"}};
+    const auto result = scorer.score("question", passages);
+    check(result.evidence.size()==2 && result.traces.size()==2, "all evidence and traces are retained");
+    for (std::size_t i=0;i<passages.size();++i) {
+        const auto& e=result.evidence[i]; const auto& trace=result.traces[i];
+        check(e.id==passages[i].id && e.document_id=="guide" && e.page==passages[i].page,
+            "score output retains citation and caller order");
+        check(e.modality==EvidenceModality::Text && e.complete && trace.evidence_id==e.id,
+            "text capability and trace identity");
+        check(trace.relevance.type==LayaQuestionType::Noul && trace.answerability.type==LayaQuestionType::Noul,
+            "two typed Noul judgments per passage");
+        check(e.relevance==trace.relevance.noul && e.answerability==trace.answerability.noul,
+            "threshold the true probability, not entropy or auxiliary action confidence");
+        check(trace.relevance.execution.cpu_rows==2 && trace.relevance.execution.records[0].completed,
+            "both judgments share one completed local inference batch");
+    }
+    check(RagDecisionGate{}.evaluate(result.evidence).action==RagAction::Answer,
+        "scorer outputs feed the gate directly");
+    check(scorer.score("question", {}).evidence.empty(), "empty retrieval requires no inference");
+}
+void evidenceTruncation(const std::filesystem::path& path) {
+    LayaDecisionMaker maker(path, {.max_length=96, .head_max_length=64});
+    const LayaEvidenceScorer scorer(maker);
+    std::string long_text; for(int i=0;i<300;++i) long_text+="state ";
+    const auto result=scorer.score("question", std::array{RagTextEvidence{"long", "guide", 1, long_text}});
+    check(!result.evidence[0].complete && result.traces[0].relevance.state_tokens_dropped>0,
+        "lost query or passage tokens are reported as incomplete evidence");
+    const auto decision=RagDecisionGate{}.evaluate(result.evidence, RagAttempt::Expanded);
+    check(decision.action==RagAction::Escalate && decision.pages.empty(), "truncation cannot authorize generation");
+    LayaDecisionMaker short_head(path, {.max_length=512, .head_max_length=16});
+    const auto missing_question=LayaEvidenceScorer(short_head).score("question",
+        std::array{RagTextEvidence{"short", "guide", 1, "state"}});
+    check(!missing_question.evidence[0].complete && missing_question.traces[0].relevance.state_tokens_dropped==0
+        && missing_question.traces[0].relevance.head_tokens_dropped>0,
+        "truncated question or criteria must fail even when the whole passage fits");
+}
+void evidenceValidation(const std::filesystem::path& path) {
+    LayaDecisionMaker maker(path); const LayaEvidenceScorer scorer(maker);
+    const RagTextEvidence valid{"text", "guide", 1, "state"};
+    rejects<std::invalid_argument>([&]{scorer.score(" \t",std::array{valid});});
+    for(int field=0;field<4;++field) {
+        auto invalid=valid;
+        if(field==0) invalid.id="";
+        if(field==1) invalid.document_id="\t";
+        if(field==2) invalid.page=0;
+        if(field==3) invalid.text=" \n";
+        rejects<std::invalid_argument>([&]{scorer.score("question",std::array{invalid});});
+    }
+    rejects<std::invalid_argument>([&]{scorer.score("question",std::array{valid,valid});});
+    auto invalid=valid; invalid.text=std::string(1,static_cast<char>(0xff));
+    rejects<std::invalid_argument>([&]{scorer.score("question",std::array{invalid});});
+}
 }
 int main(int argc,char** argv) {
     try {
@@ -161,6 +218,9 @@ int main(int argc,char** argv) {
         else if(name=="Validation") validation(path);
         else if(name=="Concurrency") verifyConcurrentInference(path);
         else if(name=="Failures") failures(path);
+        else if(name=="Evidence") evidence(path);
+        else if(name=="EvidenceTruncation") evidenceTruncation(path);
+        else if(name=="EvidenceValidation") evidenceValidation(path);
         else throw std::runtime_error("unknown test");
         return 0;
     } catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
