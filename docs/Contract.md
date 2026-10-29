@@ -1,5 +1,12 @@
 # iiDecision 0.0.5 계약
 
+소스는 `src/Decision/`, `src/Evaluation/`, `src/RAG/`, `src/Laya/`,
+`src/Acceleration/`, `src/backends/`와 공용 수치 계산용 `src/Core/`로
+구분한다. 인터페이스와 해당 구현은 함께 두며, 기존 `<iiDecision/...>` 공개
+include 경로와 설치된 헤더는 유지한다.
+설치 소비자 검사는 `IIDECISION_CONSUMER_CPU_ONLY=ON`으로 가속기 탐색 없이
+공개 CMake 패키지와 판단 API를 검사할 수 있다.
+
 의사결정 파이프라인은 `Context → IDecisionMaker → Decision`이다.
 
 - `Candidate`는 호출자가 정한 `std::string id` 하나를 소유한다.

@@ -23,7 +23,12 @@ int main(int argc, char** argv)
     iiDecision::IDecisionMaker& maker = implementation;
     const iiDecision::Decision decision = maker.decide(iiDecision::Context{}, candidates);
     if (decision.candidate_id != "A") return 1;
+#ifdef IIDECISION_CONSUMER_CPU_ONLY
+    auto matcher = std::make_shared<iiDecision::EvidenceMatcher>(
+        iiDecision::AccelerationOptions{.mode=iiDecision::ExecutionMode::CpuOnly});
+#else
     auto matcher = std::make_shared<iiDecision::EvidenceMatcher>();
+#endif
     iiDecision::ExactDecisionMaker exact({{"A", {{"x","0"}}, 0}, {"B", {{"x","1"}}, 0}},matcher);
     const auto posterior = exact.evaluate(iiDecision::Context{{{"x","0"}}}, candidates);
     const std::array cases{iiDecision::EvaluationCase{"installed", posterior, "A"}};

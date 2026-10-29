@@ -1,5 +1,9 @@
 # iiDecision 0.0.5
 
+Sources are grouped under `src/` by decision, evaluation, RAG, Laya,
+acceleration, and backend responsibility; paired interfaces and implementations
+remain together. Existing `<iiDecision/...>` public include names are unchanged.
+
 Native Metal and Vulkan acceleration is supplied by the separately built
 [GPU application adapter](examples/gpu-adapter). The application links iiDecision
 and iiGPU 0.1+ independently and injects the discovered `IEvidenceBackend`

@@ -25,14 +25,29 @@ if(PROJECT_IS_TOP_LEVEL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     endif()
 endif()
 
+set(_decision_public_headers
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Decision/IDecisionMaker.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Decision/FirstCandidateDecisionMaker.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Decision/ExactDecisionMaker.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Evaluation/Evaluation.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/RAG/RagDecisionGate.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Laya/LayaEvidenceScorer.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Laya/LayaDecisionMaker.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Acceleration/Acceleration.h")
+foreach(_header IN LISTS _decision_public_headers)
+    get_filename_component(_name "${_header}" NAME)
+    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/iiDecision/${_name}"
+        CONTENT "#pragma once\n#include \"${_header}\"\n")
+endforeach()
+
 add_library(iiDecision
-    src/FirstCandidateDecisionMaker.cpp
-    src/ExactDecisionMaker.cpp
-    src/Evaluation.cpp
-    src/RagDecisionGate.cpp
-    src/LayaEvidenceScorer.cpp
-    src/LayaDecisionMaker.cpp
-    src/Acceleration.cpp
+    src/Decision/FirstCandidateDecisionMaker.cpp
+    src/Decision/ExactDecisionMaker.cpp
+    src/Evaluation/Evaluation.cpp
+    src/RAG/RagDecisionGate.cpp
+    src/Laya/LayaEvidenceScorer.cpp
+    src/Laya/LayaDecisionMaker.cpp
+    src/Acceleration/Acceleration.cpp
     src/backends/Mlx.cpp
     src/backends/Metal.cpp
     src/backends/OpenCl.cpp
@@ -73,8 +88,10 @@ if(BUILD_SHARED_LIBS)
     endif()
 endif()
 target_include_directories(iiDecision PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(iiDecision PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/Core")
 set_target_properties(iiDecision PROPERTIES
     CXX_EXTENSIONS OFF
     VERSION ${PROJECT_VERSION}
@@ -91,7 +108,7 @@ install(TARGETS iiDecision EXPORT iiDecisionTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(DIRECTORY src/iiDecision DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${_decision_public_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiDecision)
 set(_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/iiDecision")
 configure_package_config_file(cmake/iiDecisionConfig.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/iiDecisionConfig.cmake"
@@ -110,6 +127,8 @@ install(FILES tests/acceleration.cpp tests/consumer/gpu.cpp
 install(DIRECTORY third_party/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/third_party")
 
 if(BUILD_TESTING)
+    add_test(NAME iiDecision.source_layout COMMAND ${CMAKE_COMMAND}
+        "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/source_layout.cmake")
     add_test(NAME iiDecision.sdk_boundary COMMAND ${CMAKE_COMMAND}
         "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/sdk_boundary.cmake")
     add_executable(iiDecisionRagTests tests/rag.cpp)
