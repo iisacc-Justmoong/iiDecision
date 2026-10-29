@@ -35,21 +35,9 @@ struct ExecutionReport {
     std::size_t cpu_rows = 0;
 };
 
-struct OnnxProvider {
-    std::string name; // E.g. CUDAExecutionProvider; multiple configurations are allowed.
-    std::vector<std::pair<std::string, std::string>> options;
-};
-
-struct OnnxPlugin {
-    std::string name;
-    std::string library_path;
-};
-
 struct AccelerationOptions {
     ExecutionMode mode = ExecutionMode::PreferAccelerators;
     std::vector<std::string> backend_ids; // Empty selects every available accelerator.
-    std::vector<OnnxProvider> onnx_providers;
-    std::vector<OnnxPlugin> onnx_plugins;
 };
 
 // Exact categorical matching, independent of domain and probability arithmetic.

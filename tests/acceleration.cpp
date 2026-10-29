@@ -1,15 +1,30 @@
 #include <iiDecision/Acceleration.h>
 #include <iiDecision/ExactDecisionMaker.h>
+#ifdef IIDECISION_TEST_GPU_ADAPTER
+#include "GpuAdapter.h"
+#endif
 
 #include <atomic>
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <thread>
 
 using namespace iiDecision;
 
 namespace {
+std::vector<std::shared_ptr<IEvidenceBackend>> nativeGpuBackends() {
+#ifdef IIDECISION_TEST_GPU_ADAPTER
+    auto result = gpu_adapter::discover(gpu_adapter::GpuApi::metal);
+    auto vulkan = gpu_adapter::discover(gpu_adapter::GpuApi::vulkan);
+    result.insert(result.end(),vulkan.begin(),vulkan.end());
+    return result;
+#else
+    return {};
+#endif
+}
 void check(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
 template<class Exception, class F> void rejects(F f) {
     try { f(); } catch (const Exception&) { return; }
@@ -93,13 +108,14 @@ void integration() {
     check(actual.execution.cpu_rows == 0 && backend->calls == 1, "model executes backend");
 }
 int devices(const std::string& only,bool include_cpu = false) {
-    EvidenceMatcher discovery;
+    const auto injected = nativeGpuBackends();
+    EvidenceMatcher discovery({},injected);
     bool executed = false;
     for (const auto& info : discovery.backends()) {
         std::cout << info.id << " | " << info.api << " | " << info.device << " | " << info.available << " | " << info.diagnostic << '\n';
         if (!info.available || (info.kind == DeviceKind::Cpu && !include_cpu) || (!only.empty() && !info.id.starts_with(only))) continue;
         const auto mode = include_cpu ? ExecutionMode::PreferAccelerators : ExecutionMode::RequireAccelerators;
-        EvidenceMatcher matcher({.mode=mode, .backend_ids={info.id}});
+        EvidenceMatcher matcher({.mode=mode, .backend_ids={info.id}},injected);
         std::vector<std::uint32_t> query{0xffffffff, 0x1000001, 2049};
         std::vector<std::uint32_t> values;
         std::vector<std::uint8_t> expected;
@@ -118,7 +134,7 @@ int devices(const std::string& only,bool include_cpu = false) {
             // Device filtering must preserve the entire precision contract, including
             // correlated evidence, rare mass, underflow and caller-order ties.
             auto runtime = std::make_shared<EvidenceMatcher>(AccelerationOptions{
-                .mode=mode,.backend_ids={info.id}});
+                .mode=mode,.backend_ids={info.id}},injected);
             auto cpu = std::make_shared<EvidenceMatcher>(AccelerationOptions{.mode=ExecutionMode::CpuOnly});
             const Candidate candidates[]{{"C"},{"A"},{"B"}};
             for (int fixture = 0; fixture < 4; ++fixture) {
@@ -156,8 +172,64 @@ int devices(const std::string& only,bool include_cpu = false) {
     }
     return executed ? 0 : 77;
 }
+int reuse(const std::string& prefix) {
+    const auto injected = nativeGpuBackends();
+    EvidenceMatcher discovery({},injected);
+    for (const auto& info : discovery.backends()) {
+        if (!info.available || info.kind == DeviceKind::Cpu || !info.id.starts_with(prefix)) continue;
+        EvidenceMatcher matcher({.mode=ExecutionMode::RequireAccelerators,.backend_ids={info.id}},injected);
+        const std::vector<std::uint32_t> query{UINT32_MAX,16777217};
+        for (std::size_t rows : {1u,65u,3u,1025u,17u,259u}) {
+            std::vector<std::uint32_t> values;
+            std::vector<std::uint8_t> expected;
+            for (std::size_t i=0;i<rows;++i) {
+                values.push_back(i%2?UINT32_MAX-1:UINT32_MAX); values.push_back(query[1]);
+                expected.push_back(i%2?0:1);
+            }
+            const auto result=matcher.match(rows,values,query);
+            check(result.mask==expected,"reused GPU buffers lost exact categorical results");
+            check(result.execution.cpu_rows==0&&result.execution.records.size()==1&&result.execution.records[0].completed,
+                "reused GPU pipeline silently fell back");
+        }
+        std::cout<<"REUSED "<<info.id<<" shapes=6 exact_uint32=true cpu_rows=0\n";
+        return 0;
+    }
+    return 77;
+}
+#ifdef IIDECISION_TEST_GPU_ADAPTER
+int sharedGpuConcurrency() {
+    auto backends = nativeGpuBackends();
+    std::shared_ptr<IEvidenceBackend> selected;
+    for (const auto& backend : backends) {
+        const auto info = backend->info();
+        if (info.available && info.kind == DeviceKind::Gpu) { selected=backend; break; }
+    }
+    if (!selected) return 77;
+    const auto id = selected->info().id;
+    const AccelerationOptions options{.mode=ExecutionMode::RequireAccelerators,.backend_ids={id}};
+    EvidenceMatcher first(options,{selected}), second(options,{selected});
+    const std::vector<std::uint32_t> query{UINT32_MAX,16777217};
+    const std::vector<std::uint32_t> values{UINT32_MAX,16777217,0,16777217};
+    std::exception_ptr first_error, second_error;
+    auto exercise = [&](EvidenceMatcher& matcher,std::exception_ptr& error) {
+        try {
+            for (int i=0;i<8;++i) {
+                const auto result=matcher.match(2,values,query);
+                check(result.mask==std::vector<std::uint8_t>{1,0} && result.execution.cpu_rows==0,
+                      "shared GPU adapter returned an incorrect result");
+            }
+        } catch (...) { error=std::current_exception(); }
+    };
+    std::jthread a([&] { exercise(first,first_error); });
+    std::jthread b([&] { exercise(second,second_error); });
+    a.join(); b.join();
+    if(first_error) std::rethrow_exception(first_error);
+    if(second_error) std::rethrow_exception(second_error);
+    return 0;
+}
+#endif
 void allDevices() {
-    EvidenceMatcher matcher({.mode=ExecutionMode::RequireAccelerators});
+    EvidenceMatcher matcher({.mode=ExecutionMode::RequireAccelerators},nativeGpuBackends());
     std::size_t available = 0;
     for (const auto& device : matcher.backends()) if (device.available && device.kind != DeviceKind::Cpu) ++available;
     if (!available) throw std::runtime_error("no hardware for simultaneous execution");
@@ -177,7 +249,10 @@ int main(int argc, char** argv) {
         else if (name == "Scheduling") scheduling();
         else if (name == "Integration") integration();
         else if (name == "Devices") return devices(argc > 2 ? argv[2] : "");
-        else if (name == "OnnxCpu") return devices("onnx/CPUExecutionProvider/",true);
+        else if (name == "Reuse") return reuse(argc > 2 ? argv[2] : "metal/");
+#ifdef IIDECISION_TEST_GPU_ADAPTER
+        else if (name == "SharedGpuConcurrency") return sharedGpuConcurrency();
+#endif
         else if (name == "AllDevices") allDevices();
         else throw std::invalid_argument("unknown test");
         return 0;

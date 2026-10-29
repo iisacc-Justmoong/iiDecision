@@ -45,7 +45,6 @@ EvidenceMatcher::EvidenceMatcher(AccelerationOptions options,
         probe("mlx","MLX",[&]{detail::addMlx(backends);});
         probe("opencl","OpenCL",[&]{detail::addOpenCl(backends);});
         probe("vulkan","Vulkan",[&]{detail::addVulkan(backends);});
-        probe("onnx","ONNX Runtime",[&]{detail::addOnnx(backends,impl_->options);});
     }
     backends.insert(backends.end(),additional.begin(),additional.end());
     std::set<std::string> ids;

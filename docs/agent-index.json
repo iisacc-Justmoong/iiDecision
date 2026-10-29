@@ -1,0 +1,125 @@
+{
+  "format": "iisacc.agent-document-index",
+  "schema_version": 1,
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "documentation_root": "docs",
+  "agent_schema": "docs/agent-document.schema.json",
+  "documents": [
+    {
+      "document_id": "urn:iisacc:document:ab66e370155edaff29f5a38d2d2c29dcfbcb08bd34fb49f8c6e4c6fad0fa25ce",
+      "source": "AGENT.md",
+      "agent_json": "docs/entrypoints/AGENT.agent.json",
+      "source_sha256": "c375f80bcc8ca4c78c9d7f93a4c701c33cb00a8ec8a096dc98f342ffb6a0f09a",
+      "role": "instructions"
+    },
+    {
+      "document_id": "urn:iisacc:document:b49dc88d82113e66d43c46c337dcdc64a1ff47a9ca81dc2bf671f393c2bc8414",
+      "source": "README.md",
+      "agent_json": "docs/entrypoints/README.agent.json",
+      "source_sha256": "9eb3fa2097d1c3a552b40fecd7a227be31cd370eb85dc7249bac843a473948dc",
+      "role": "overview"
+    },
+    {
+      "document_id": "urn:iisacc:document:8ee0d05a8bcfc06b30aca71eb92a9d74491ae9e67d9b8ea1421a578b813da79b",
+      "source": "docs/Acceleration.md",
+      "agent_json": "docs/Acceleration.agent.json",
+      "source_sha256": "2ca2edc02e895c496de98ced2c3cbdc933521a3223b522a977ad72c0a3f10cd0",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:be5c9aedb531b36f68933503d504048cd21f195b08066a8c95611cfc144c050e",
+      "source": "docs/AgenticRag.md",
+      "agent_json": "docs/AgenticRag.agent.json",
+      "source_sha256": "38c5b189feeb57028be90305a5228e8a1aef60ca2798885f5619fcc4f521a640",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:6e06f73a67d5c4357606d5a2513c6554e78324be7c1d7c66f16794b4c506e9ce",
+      "source": "docs/Contract.md",
+      "agent_json": "docs/Contract.agent.json",
+      "source_sha256": "86cb40f6e34e92d831324e5dbde8f92805b299729fa90c4e86959551913c5603",
+      "role": "reference"
+    },
+    {
+      "document_id": "urn:iisacc:document:ec781d628fc0b1eff8b439ae40b158503d811f0657ebe99c5979c66cadb5dcb2",
+      "source": "docs/Laya.md",
+      "agent_json": "docs/Laya.agent.json",
+      "source_sha256": "da2f428f20fc5c47d321019fe9227be37faa28b60527ac14cb4007fd5e04e950",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:bbf9d4d3387cfa695d4596fc18a58cae81c0b3bac31a473d89234a2c68f74870",
+      "source": "docs/Probability.md",
+      "agent_json": "docs/Probability.agent.json",
+      "source_sha256": "e1d72f39fbb8bbee80420791acc0e28fc9a063827188bff554fa8a1fc4362c71",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:925ed444691d2b3ac45ebdbcfc4b991214a34b2e78a8ffb0b3ffa0054135531f",
+      "source": "docs/README.md",
+      "agent_json": "docs/README.agent.json",
+      "source_sha256": "04b5e2295523b5478627574e59df36aac9b7d6b22dcf91dd84affe801cb2dbd4",
+      "role": "overview"
+    },
+    {
+      "document_id": "urn:iisacc:document:97ae9e5c281b8359eb9e5368a57289246a88a42f770136234c39fd8f6e740d01",
+      "source": "docs/Research.md",
+      "agent_json": "docs/Research.agent.json",
+      "source_sha256": "9839d5f24508f682a314b21a3da14c4378bb87ae9bd6d449f42f23e2fe1d28de",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:6cf46159662b60b8288b6c143d0dd13be83dea4747f782d35ba3ad6561dd5074",
+      "source": "docs/RuntimeRetirement.md",
+      "agent_json": "docs/RuntimeRetirement.agent.json",
+      "source_sha256": "afac00cdf0640708a56d548e74a2677029eb5a421f3f86c9b467f4b07d98931f",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:75867e27860b499b9794506dc7d472684035e87e1dc4461d8f2baf9b99be97d2",
+      "source": "docs/Verification.md",
+      "agent_json": "docs/Verification.agent.json",
+      "source_sha256": "f1b4e23a5e77b3417104bd61e140337d961ddbeca054dfd8d6852e5b1ebda3ef",
+      "role": "evidence"
+    },
+    {
+      "document_id": "urn:iisacc:document:b77c0d641b52139cf3f10d0e8e767fcbc0e427473d08f8a5ccde2b035773383e",
+      "source": "docs/Windows.md",
+      "agent_json": "docs/Windows.agent.json",
+      "source_sha256": "05f5f4f3cb7f193898254d7b1ffe767243631b92f61f520042d3a36404c52110",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:4c51ffe774ec04409ace3df75dbd0d909747bac88414b9874f715efbbc78d9a2",
+      "source": "docs/WindowsBuildAndRun.md",
+      "agent_json": "docs/WindowsBuildAndRun.agent.json",
+      "source_sha256": "a827f272d46c7b52a0b9d60381c6dca320264cf7f80f45034166cda8efafb1cf",
+      "role": "guide"
+    },
+    {
+      "document_id": "urn:iisacc:document:58369e6f8a6d601643fe8351a6db04ef846003dc5f8f4301d9af3f0cc5dd6581",
+      "source": "docs/documentation-structure.md",
+      "agent_json": "docs/documentation-structure.agent.json",
+      "source_sha256": "b26a3762123c9575faef568225b02af3c3b4a808496ec6284e1bc69e60ea1f75",
+      "role": "guide"
+    }
+  ],
+  "layout": {
+    "human_entry": "README.md",
+    "agent_entry": "AGENT.md",
+    "human_format": "markdown",
+    "agent_format": "structured_json",
+    "source_authority": "markdown"
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

@@ -1,0 +1,410 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:bbf9d4d3387cfa695d4596fc18a58cae81c0b3bac31a473d89234a2c68f74870",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Probability.md",
+    "sha256": "e1d72f39fbb8bbee80420791acc0e28fc9a063827188bff554fa8a1fc4362c71",
+    "bytes": 4880,
+    "line_count": 70,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "확률 모델과 정밀도 정책",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# 확률 모델과 정밀도 정책\n",
+      "level": 1,
+      "title": "확률 모델과 정밀도 정책"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 6,
+      "raw": "iiDecision의 우선순위는 **수학적 계약의 명료성 → 수치 안정성 → 검증 가능성 → 속도**이다.\n빠른 직관적 판단을 제품 목표로 삼는 Jev에서 구조화된 확률 반환을 참고하되,\niiDecision은 입력된 확률 모델을 정밀하게 계산하는 목적을 명시적으로 가진다.\n응답 시간 목표나 근사 추론을 기본 동작으로 두지 않는다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 8,
+      "end_line": 10,
+      "raw": "네이티브 가속은 이 순위를 변경하지 않는다. 범주형 증거 일치 여부를 장치에서\n정확한 0·1로 계산하고 확률 합산은 기존 정밀도 경로로 수행한다. 구현과 실제\n하드웨어 검증 범위는 [가속 문서](Acceleration.md)에 정의한다.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 11,
+      "end_line": 11,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "heading",
+      "start_line": 12,
+      "end_line": 12,
+      "raw": "## 유한 결합 모델\n",
+      "level": 2,
+      "title": "유한 결합 모델"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 13,
+      "end_line": 13,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 14,
+      "end_line": 16,
+      "raw": "호출자는 서로 배타적인 후보 C와 관측 변수 X의 유한 결합 상태를 제공한다.\n각 상태 s의 질량은 `w(s) = exp(log_weight(s))`이다. 정규화 상수를 Z라 하면\n`P(s) = w(s) / Z`이다. 여러 관측 E가 주어지면 다음 값을 전수 합산한다.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 17,
+      "end_line": 17,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "fenced_code",
+      "start_line": 18,
+      "end_line": 22,
+      "raw": "```\nP(C=c | E) = sum(w(s), s satisfies E and C=c) / sum(w(s), s satisfies E)\nP(E)       = sum(w(s), s satisfies E) / sum(w(s), all s)\nH(C | E)   = -sum(P(c | E) * ln(P(c | E)), all c)\n```\n",
+      "language": "",
+      "code": "P(C=c | E) = sum(w(s), s satisfies E and C=c) / sum(w(s), s satisfies E)\nP(E)       = sum(w(s), s satisfies E) / sum(w(s), all s)\nH(C | E)   = -sum(P(c | E) * ln(P(c | E)), all c)\n",
+      "closed": true
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 23,
+      "end_line": 23,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 24,
+      "end_line": 27,
+      "raw": "관측 사이의 독립성을 가정하지 않는다. 상관관계는 결합 상태의 가중치에 표현된다.\n유한 모델의 모든 선언된 상태를 계산하므로 Monte Carlo 오차, beam pruning,\n상위 후보 절단은 없다. 표에 생략된 조합은 확률 0이다. 모델 전체가 현실을\n충분히 표현하는지는 호출자의 모델링과 별도 평가로 확인해야 한다.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 28,
+      "end_line": 28,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 29,
+      "end_line": 31,
+      "raw": "입력 질량이 이미 정규화되어 있을 필요는 없다. 최대 확률 선택은 가장 가능성이\n높은 대안의 선택이다. 비용이나 행동 결과의 최대 기대 효용 계산과는 다른 목적이다.\n두 목적을 같은 probability 필드로 혼합하지 않는다.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 32,
+      "end_line": 32,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "heading",
+      "start_line": 33,
+      "end_line": 33,
+      "raw": "## 수치 연산\n",
+      "level": 2,
+      "title": "수치 연산"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 34,
+      "end_line": 34,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "list",
+      "start_line": 35,
+      "end_line": 49,
+      "raw": "- `long double`과 자연로그를 사용한다. `probability_mantissa_bits`는 실제 가수\n  비트 수이다. macOS arm64에서는 보통 double과 같은 53비트이며 이 검증에서도\n  실제 값을 기록한다. 타입 이름만으로 더 높은 정밀도를 주장하지 않는다.\n- 최대 로그 가중치를 기준으로 이동하고, 선두 항의 1을 분리한 `log1p`와\n  Neumaier 보상 합산을 사용한다. 합산 순서를 정렬하여 모델 행 순서에 의존하는\n  반올림 차이를 줄이고 동일 환경에서 재현한다.\n- 조건부 확률은 일치 상태 안에서 다시 기준값을 잡는다. 전체 분포에서 매우 드문\n  증거가 선형 underflow하더라도 조건부 분포 계산에 그 0을 사용하지 않는다.\n- 확률과 로그 확률을 함께 보존한다. 선형 확률이 숫자 표현 범위 밖이라 0이 된\n  경우와 모델에서 선언한 확률 0을 구분하며 `underflowed_candidates`를 보고한다.\n- `normalization_error = abs(sum(probability) - 1)`를 보고한다. 이는 정규화 잔차이며\n  모든 계산의 오차 상한이나 모델의 정답률을 의미하지 않는다.\n- 부동소수점 범위를 벗어난 연산은 명시적으로 실패한다. fast-math와 부동소수점\n  contraction을 라이브러리 빌드에서 비활성화한다. 플랫폼 간 비트 단위 일치는\n  계약에 포함하지 않는다.\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "`long double`과 자연로그를 사용한다. `probability_mantissa_bits`는 실제 가수",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "최대 로그 가중치를 기준으로 이동하고, 선두 항의 1을 분리한 `log1p`와",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "조건부 확률은 일치 상태 안에서 다시 기준값을 잡는다. 전체 분포에서 매우 드문",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "확률과 로그 확률을 함께 보존한다. 선형 확률이 숫자 표현 범위 밖이라 0이 된",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`normalization_error = abs(sum(probability) - 1)`를 보고한다. 이는 정규화 잔차이며",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "부동소수점 범위를 벗어난 연산은 명시적으로 실패한다. fast-math와 부동소수점",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 50,
+      "end_line": 50,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 51,
+      "end_line": 53,
+      "raw": "정확한 유한 상태 추론과 정확한 실수 산술은 구분한다. 임의 정밀도나 엄밀한\n구간 오차 경계를 제공하는 구현은 아니다. 현재 정확성의 증거는 수학적 기준값,\n경계 테스트와 90자리 Decimal 기반의 독립 검증이다.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 54,
+      "end_line": 54,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "heading",
+      "start_line": 55,
+      "end_line": 55,
+      "raw": "## 예측 품질 평가\n",
+      "level": 2,
+      "title": "예측 품질 평가"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 56,
+      "end_line": 56,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "list",
+      "start_line": 57,
+      "end_line": 65,
+      "raw": "- 정확도: 선택 후보와 정답이 일치한 사례의 비율이다.\n- Log loss: `-ln(P(target))`의 평균이다. 유한 로그 확률을 직접 사용하므로\n  선형 underflow로 무한대가 되는 오류를 피한다. 구조적 0만 무한대이다.\n- Multiclass Brier: 사례별 `sum((P(c) - 1[c=target])^2)`의 평균이다.\n  클래스 수로 나누지 않으며 범위는 0~2이다.\n- Reliability bins: 선택한 후보의 확률을 0~1의 동일 폭 구간에 넣고, 각 구간의\n  사례 수·평균 선택 확률·실제 정확도를 반환한다. 1은 마지막 구간에 속한다.\n- ECE: 각 구간에서 평균 선택 확률과 정확도의 차이에 사례 비율을 곱한 합이다.\n  구간 수와 표본 수에 영향을 받는다. 빈 구간의 count는 0으로 유지한다.\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "정확도: 선택 후보와 정답이 일치한 사례의 비율이다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Log loss: `-ln(P(target))`의 평균이다. 유한 로그 확률을 직접 사용하므로",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Multiclass Brier: 사례별 `sum((P(c) - 1[c=target])^2)`의 평균이다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Reliability bins: 선택한 후보의 확률을 0~1의 동일 폭 구간에 넣고, 각 구간의",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "ECE: 각 구간에서 평균 선택 확률과 정확도의 차이에 사례 비율을 곱한 합이다.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 67,
+      "end_line": 70,
+      "raw": "엔트로피는 분포의 불확실성이다. Brier와 log loss는 calibration 외에 판별력도\n반영하므로 하나의 숫자만으로 calibration을 입증하지 않는다. Reliability와\nECE는 정답이 있는 독립 평가 데이터에서 함께 해석한다. 예제와 수치 검증의\n합성 데이터는 실제 제품의 예측 정확성 증거로 사용하지 않는다.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "확률 모델과 정밀도 정책",
+      "anchor": "확률-모델과-정밀도-정책",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000007",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "유한 결합 모델",
+      "anchor": "유한-결합-모델",
+      "start_line": 12
+    },
+    {
+      "block_id": "b000017",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "수치 연산",
+      "anchor": "수치-연산",
+      "start_line": 33
+    },
+    {
+      "block_id": "b000023",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "예측 품질 평가",
+      "anchor": "예측-품질-평가",
+      "start_line": 55
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000005",
+        "line": 8,
+        "text": "네이티브 가속은 이 순위를 변경하지 않는다. 범주형 증거 일치 여부를 장치에서",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 24,
+        "text": "관측 사이의 독립성을 가정하지 않는다. 상관관계는 결합 상태의 가중치에 표현된다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000013",
+        "line": 27,
+        "text": "충분히 표현하는지는 호출자의 모델링과 별도 평가로 확인해야 한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000015",
+        "line": 31,
+        "text": "두 목적을 같은 probability 필드로 혼합하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000019",
+        "line": 37,
+        "text": "실제 값을 기록한다. 타입 이름만으로 더 높은 정밀도를 주장하지 않는다.",
+        "basis": "lexical_match",
+        "context": "list"
+      },
+      {
+        "block_id": "b000019",
+        "line": 42,
+        "text": "증거가 선형 underflow하더라도 조건부 분포 계산에 그 0을 사용하지 않는다.",
+        "basis": "lexical_match",
+        "context": "list"
+      },
+      {
+        "block_id": "b000019",
+        "line": 46,
+        "text": "모든 계산의 오차 상한이나 모델의 정답률을 의미하지 않는다.",
+        "basis": "lexical_match",
+        "context": "list"
+      },
+      {
+        "block_id": "b000019",
+        "line": 49,
+        "text": "계약에 포함하지 않는다.",
+        "basis": "lexical_match",
+        "context": "list"
+      },
+      {
+        "block_id": "b000027",
+        "line": 68,
+        "text": "반영하므로 하나의 숫자만으로 calibration을 입증하지 않는다. Reliability와",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000027",
+        "line": 70,
+        "text": "합성 데이터는 실제 제품의 예측 정확성 증거로 사용하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000005",
+        "label": "가속 문서",
+        "target": "Acceleration.md",
+        "kind": "relative",
+        "line": 10
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

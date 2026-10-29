@@ -1,6 +1,14 @@
 # iiDecision 0.0.5
 
-[Windows 빌드 및 실행](docs/WindowsBuildAndRun.md)
+Native Metal and Vulkan acceleration is supplied by the separately built
+[GPU application adapter](examples/gpu-adapter). The application links iiDecision
+and iiGPU 0.1+ independently and injects the discovered `IEvidenceBackend`
+instances. The exact integer evidence kernel, device IDs, pipeline and buffer
+reuse, and precision guarantees are retained. Metal and Vulkan are no longer
+automatically discovered by the iiDecision library; applications using those
+backends must register the adapter. See [the native acceleration contract](docs/Acceleration.md).
+
+[Windows build and execution](docs/WindowsBuildAndRun.md)
 
 Package release: **0.0.5** (2026-10-19). This patch packages the current
 source snapshot; build, test and installation evidence is recorded in the SDK
@@ -13,7 +21,7 @@ A C++23 decision-making library that takes a Context and multiple Candidates and
 
 The minimal `IDecisionMaker`, `Candidate`, and `Decision` contracts are retained. Categorical observations have been added to `Context`, and an empty `Context{}` is also valid. `FirstCandidateDecisionMaker` returns the first candidate, while `ExactDecisionMaker` calculates conditional probabilities given the observed evidence. It uses a C++23 core and optional native acceleration SDKs. There is no Qt dependency.
 
-**Multiple available accelerators are used together within the bounds of preserving precision.** Direct execution paths for Metal, MLX, OpenCL, and Vulkan, along with GPU and NPU providers from ONNX Runtime, have been connected. Categorical evidence comparisons run on the device, while log-mass summation, conditional probabilities, and entropy retain the existing `long double` calculations. The number of devices and providers is not limited to one per platform. The actual execution path and CPU fallback execution are recorded in the report.
+**Multiple available accelerators are used together within the bounds of preserving precision.** Direct execution paths for Metal, MLX, OpenCL, and Vulkan are available when their native SDKs are configured. Categorical evidence comparisons run on the device, while log-mass summation, conditional probabilities, and entropy retain the existing `long double` calculations. The number of devices and providers is not limited to one per platform. The actual execution path and CPU fallback execution are recorded in the report.
 
 <a id="10줄-사용-예제"></a>
 
@@ -89,34 +97,18 @@ for (const auto& run : prediction.execution.records) {
 By default, state rows are distributed across the discovered accelerators and executed concurrently. Failed ranges are calculated on the CPU, and the causes of failure are recorded. To prohibit CPU fallback execution, use `AccelerationOptions::mode = ExecutionMode::RequireAccelerators`. Accelerator selection, provider options, plugin registration, platform-specific preparation, and verified limitations are described in
 the [acceleration document](docs/Acceleration.md).
 
-The CMake options `IIDECISION_METAL`, `IIDECISION_MLX`, `IIDECISION_OPENCL`, `IIDECISION_VULKAN`, and `IIDECISION_ONNX` each accept `AUTO`, `ON`, or `OFF`. The default `AUTO` discovers installed SDKs and includes them in the build; `ON` makes configuration fail if the SDK is absent. The CPU core can also be built on platforms without these SDKs. Specify the C++ SDK paths with `ONNXRuntime_ROOT` for ONNX Runtime and `MLX_DIR` for MLX. Python bindings are not included as runtime dependencies.
+The library options `IIDECISION_MLX` and `IIDECISION_OPENCL` accept `AUTO`,
+`ON`, or `OFF`. Existing `IIDECISION_METAL` and `IIDECISION_VULKAN` cache
+settings no longer enable built-in backends; use the application adapter.
+ONNX Runtime support has
+been removed. No provider plugins or model runtime are discovered for it.
 
-## Laya model backend
+## Retired Laya model backend
 
-`LayaDecisionMaker` adds local compatibility with the official [Laya decision model](https://huggingface.co/convaiinnovations/laya).
-It selects actions from a supplied state and options through the existing `IDecisionMaker` contract, and also exposes
-typed `Choice`, `Score`, and `Noul` questions in a single ONNX forward pass. This learned model backend is separate
-from exhaustive finite-state probability inference.
-
-```cpp
-#include <iiDecision/LayaDecisionMaker.h>
-#include <array>
-
-iiDecision::LayaDecisionMaker maker("local-laya-package");
-const std::array questions{
-    iiDecision::LayaQuestion{"route", "Choose the next action.",
-        iiDecision::LayaQuestionType::Choice,
-        {{"refund", "Issue a refund"}, {"support", "Provide technical support"}}}
-};
-const auto answers = maker.predict("The customer reports an application crash.", questions);
-```
-
-`IIDECISION_LAYA=AUTO|ON|OFF` controls the backend. It needs the ONNX Runtime C++ SDK and Cargo at build time;
-the native Hugging Face tokenizer archive is included in the installed CMake package. Inference uses local
-ONNX Runtime CPU execution without Qt, Python, or a hosted service. The checkpoint must first be exported
-using `tools/export_laya.py`; Python and the pinned official `laya==0.3.24` package are preparation tools only.
-See [Laya compatibility and model preparation](docs/Laya.md) for the input contract, token budgets,
-temperature scaling, upstream attribution, and the verified scope.
+The previous learned Laya backend, exporter, downloader, and tokenizer build are
+retired. `LayaDecisionMaker::available()` returns false and constructing a model
+reports an explicit error. Exact probability calculation and the native evidence
+interfaces remain available. See [the retirement contract](docs/RuntimeRetirement.md).
 
 ## Evidence-aware RAG decisions
 
@@ -138,11 +130,10 @@ const auto report = iiDecision::RagDecisionGate{}.evaluate(evidence);
 // report.action == iiDecision::RagAction::Answer; cite report.pages.
 ```
 
-`LayaEvidenceScorer` runs two Noul judgments per text passage in one local forward
-pass, retains the full model diagnostics, and marks truncated passages or scoring criteria as incomplete
-so they cannot authorize generation. Image evidence requires scores from a separate
-image-capable model. The gate adds no Qt, network, or model dependency; thresholds
-require validation on representative labeled data. See the [RAG contract and examples](docs/AgenticRag.md).
+The previous learned evidence scorer is retired with the Laya model backend.
+`RagDecisionGate` remains an independent contract for validated evidence supplied
+by supported application components. It performs no implicit model inference.
+See the [RAG contract and examples](docs/AgenticRag.md).
 
 I/O and lifetime rules are defined in the [contract document](docs/Contract.md); formulas and precision policies in
 the [probability-model document](docs/Probability.md); the review of materials and reasons for adoption in
@@ -156,3 +147,12 @@ SPDX-License-Identifier: MIT
 The original code and documentation in this repository are licensed under the
 [MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model
 weights retain their respective licenses.
+
+<!-- workspace-docs:readme:start -->
+## Documentation entry points
+
+- Human overview: this English `README.md`.
+- Agent instructions: [AGENT.md](AGENT.md).
+- Human documentation: [documentation index](docs/README.md).
+- Structured agent documentation: [agent index](docs/agent-index.json).
+<!-- workspace-docs:readme:end -->

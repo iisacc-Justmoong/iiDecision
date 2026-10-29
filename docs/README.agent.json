@@ -1,0 +1,426 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:925ed444691d2b3ac45ebdbcfc4b991214a34b2e78a8ffb0b3ffa0054135531f",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/README.md",
+    "sha256": "04b5e2295523b5478627574e59df36aac9b7d6b22dcf91dd84affe801cb2dbd4",
+    "bytes": 1299,
+    "line_count": 23,
+    "encoding": "utf-8",
+    "language": "en"
+  },
+  "document": {
+    "title": "iiDecision Documentation",
+    "role": "overview",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# iiDecision Documentation\n",
+      "level": 1,
+      "title": "iiDecision Documentation"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "html",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "<!-- workspace-docs:document-map:start -->\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "heading",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "## Human and agent document map\n",
+      "level": 2,
+      "title": "Human and agent document map"
+    },
+    {
+      "id": "b000005",
+      "kind": "blank",
+      "start_line": 5,
+      "end_line": 5,
+      "raw": "\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "paragraph",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "Markdown is the maintained human source. Agent JSON is a structured, source-traceable projection.\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "blank",
+      "start_line": 7,
+      "end_line": 7,
+      "raw": "\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "table",
+      "start_line": 8,
+      "end_line": 22,
+      "raw": "| Document | Agent JSON |\n| --- | --- |\n| [`AGENT.md`](../AGENT.md) | [JSON](entrypoints/AGENT.agent.json) |\n| [`README.md`](../README.md) | [JSON](entrypoints/README.agent.json) |\n| [`docs/Acceleration.md`](Acceleration.md) | [JSON](Acceleration.agent.json) |\n| [`docs/AgenticRag.md`](AgenticRag.md) | [JSON](AgenticRag.agent.json) |\n| [`docs/Contract.md`](Contract.md) | [JSON](Contract.agent.json) |\n| [`docs/Laya.md`](Laya.md) | [JSON](Laya.agent.json) |\n| [`docs/Probability.md`](Probability.md) | [JSON](Probability.agent.json) |\n| [`docs/Research.md`](Research.md) | [JSON](Research.agent.json) |\n| [`docs/RuntimeRetirement.md`](RuntimeRetirement.md) | [JSON](RuntimeRetirement.agent.json) |\n| [`docs/Verification.md`](Verification.md) | [JSON](Verification.agent.json) |\n| [`docs/Windows.md`](Windows.md) | [JSON](Windows.agent.json) |\n| [`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md) | [JSON](WindowsBuildAndRun.agent.json) |\n| [`docs/documentation-structure.md`](documentation-structure.md) | [JSON](documentation-structure.agent.json) |\n",
+      "columns": [
+        "Document",
+        "Agent JSON"
+      ],
+      "rows": [
+        [
+          "[`AGENT.md`](../AGENT.md)",
+          "[JSON](entrypoints/AGENT.agent.json)"
+        ],
+        [
+          "[`README.md`](../README.md)",
+          "[JSON](entrypoints/README.agent.json)"
+        ],
+        [
+          "[`docs/Acceleration.md`](Acceleration.md)",
+          "[JSON](Acceleration.agent.json)"
+        ],
+        [
+          "[`docs/AgenticRag.md`](AgenticRag.md)",
+          "[JSON](AgenticRag.agent.json)"
+        ],
+        [
+          "[`docs/Contract.md`](Contract.md)",
+          "[JSON](Contract.agent.json)"
+        ],
+        [
+          "[`docs/Laya.md`](Laya.md)",
+          "[JSON](Laya.agent.json)"
+        ],
+        [
+          "[`docs/Probability.md`](Probability.md)",
+          "[JSON](Probability.agent.json)"
+        ],
+        [
+          "[`docs/Research.md`](Research.md)",
+          "[JSON](Research.agent.json)"
+        ],
+        [
+          "[`docs/RuntimeRetirement.md`](RuntimeRetirement.md)",
+          "[JSON](RuntimeRetirement.agent.json)"
+        ],
+        [
+          "[`docs/Verification.md`](Verification.md)",
+          "[JSON](Verification.agent.json)"
+        ],
+        [
+          "[`docs/Windows.md`](Windows.md)",
+          "[JSON](Windows.agent.json)"
+        ],
+        [
+          "[`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md)",
+          "[JSON](WindowsBuildAndRun.agent.json)"
+        ],
+        [
+          "[`docs/documentation-structure.md`](documentation-structure.md)",
+          "[JSON](documentation-structure.agent.json)"
+        ]
+      ]
+    },
+    {
+      "id": "b000009",
+      "kind": "html",
+      "start_line": 23,
+      "end_line": 23,
+      "raw": "<!-- workspace-docs:document-map:end -->\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "iiDecision Documentation",
+      "anchor": "iidecision-documentation",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000004",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Human and agent document map",
+      "anchor": "human-and-agent-document-map",
+      "start_line": 4
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [],
+    "commands": [],
+    "links": [
+      {
+        "block_id": "b000008",
+        "label": "`AGENT.md`",
+        "target": "../AGENT.md",
+        "kind": "relative",
+        "line": 10
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "entrypoints/AGENT.agent.json",
+        "kind": "relative",
+        "line": 10
+      },
+      {
+        "block_id": "b000008",
+        "label": "`README.md`",
+        "target": "../README.md",
+        "kind": "relative",
+        "line": 11
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "entrypoints/README.agent.json",
+        "kind": "relative",
+        "line": 11
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Acceleration.md`",
+        "target": "Acceleration.md",
+        "kind": "relative",
+        "line": 12
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Acceleration.agent.json",
+        "kind": "relative",
+        "line": 12
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/AgenticRag.md`",
+        "target": "AgenticRag.md",
+        "kind": "relative",
+        "line": 13
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "AgenticRag.agent.json",
+        "kind": "relative",
+        "line": 13
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Contract.md`",
+        "target": "Contract.md",
+        "kind": "relative",
+        "line": 14
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Contract.agent.json",
+        "kind": "relative",
+        "line": 14
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Laya.md`",
+        "target": "Laya.md",
+        "kind": "relative",
+        "line": 15
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Laya.agent.json",
+        "kind": "relative",
+        "line": 15
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Probability.md`",
+        "target": "Probability.md",
+        "kind": "relative",
+        "line": 16
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Probability.agent.json",
+        "kind": "relative",
+        "line": 16
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Research.md`",
+        "target": "Research.md",
+        "kind": "relative",
+        "line": 17
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Research.agent.json",
+        "kind": "relative",
+        "line": 17
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/RuntimeRetirement.md`",
+        "target": "RuntimeRetirement.md",
+        "kind": "relative",
+        "line": 18
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "RuntimeRetirement.agent.json",
+        "kind": "relative",
+        "line": 18
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Verification.md`",
+        "target": "Verification.md",
+        "kind": "relative",
+        "line": 19
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Verification.agent.json",
+        "kind": "relative",
+        "line": 19
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/Windows.md`",
+        "target": "Windows.md",
+        "kind": "relative",
+        "line": 20
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "Windows.agent.json",
+        "kind": "relative",
+        "line": 20
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/WindowsBuildAndRun.md`",
+        "target": "WindowsBuildAndRun.md",
+        "kind": "relative",
+        "line": 21
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "WindowsBuildAndRun.agent.json",
+        "kind": "relative",
+        "line": 21
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/documentation-structure.md`",
+        "target": "documentation-structure.md",
+        "kind": "relative",
+        "line": 22
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "documentation-structure.agent.json",
+        "kind": "relative",
+        "line": 22
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000008",
+        "columns": [
+          "Document",
+          "Agent JSON"
+        ],
+        "rows": [
+          [
+            "[`AGENT.md`](../AGENT.md)",
+            "[JSON](entrypoints/AGENT.agent.json)"
+          ],
+          [
+            "[`README.md`](../README.md)",
+            "[JSON](entrypoints/README.agent.json)"
+          ],
+          [
+            "[`docs/Acceleration.md`](Acceleration.md)",
+            "[JSON](Acceleration.agent.json)"
+          ],
+          [
+            "[`docs/AgenticRag.md`](AgenticRag.md)",
+            "[JSON](AgenticRag.agent.json)"
+          ],
+          [
+            "[`docs/Contract.md`](Contract.md)",
+            "[JSON](Contract.agent.json)"
+          ],
+          [
+            "[`docs/Laya.md`](Laya.md)",
+            "[JSON](Laya.agent.json)"
+          ],
+          [
+            "[`docs/Probability.md`](Probability.md)",
+            "[JSON](Probability.agent.json)"
+          ],
+          [
+            "[`docs/Research.md`](Research.md)",
+            "[JSON](Research.agent.json)"
+          ],
+          [
+            "[`docs/RuntimeRetirement.md`](RuntimeRetirement.md)",
+            "[JSON](RuntimeRetirement.agent.json)"
+          ],
+          [
+            "[`docs/Verification.md`](Verification.md)",
+            "[JSON](Verification.agent.json)"
+          ],
+          [
+            "[`docs/Windows.md`](Windows.md)",
+            "[JSON](Windows.agent.json)"
+          ],
+          [
+            "[`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md)",
+            "[JSON](WindowsBuildAndRun.agent.json)"
+          ],
+          [
+            "[`docs/documentation-structure.md`](documentation-structure.md)",
+            "[JSON](documentation-structure.agent.json)"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

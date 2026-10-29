@@ -1,4 +1,4 @@
-// Generated from evidence.comp by tools/compile_shader.py.
+// Generated from evidence.comp by App/compile_shader.py.
 #pragma once
 #include <cstdint>
 namespace iiDecision::detail {

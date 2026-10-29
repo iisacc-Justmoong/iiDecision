@@ -1,0 +1,930 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:b49dc88d82113e66d43c46c337dcdc64a1ff47a9ca81dc2bf671f393c2bc8414",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "README.md",
+    "sha256": "9eb3fa2097d1c3a552b40fecd7a227be31cd370eb85dc7249bac843a473948dc",
+    "bytes": 8981,
+    "line_count": 158,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "iiDecision 0.0.5",
+    "role": "overview",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# iiDecision 0.0.5\n",
+      "level": 1,
+      "title": "iiDecision 0.0.5"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 9,
+      "raw": "Native Metal and Vulkan acceleration is supplied by the separately built\n[GPU application adapter](examples/gpu-adapter). The application links iiDecision\nand iiGPU 0.1+ independently and injects the discovered `IEvidenceBackend`\ninstances. The exact integer evidence kernel, device IDs, pipeline and buffer\nreuse, and precision guarantees are retained. Metal and Vulkan are no longer\nautomatically discovered by the iiDecision library; applications using those\nbackends must register the adapter. See [the native acceleration contract](docs/Acceleration.md).\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 10,
+      "end_line": 10,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 11,
+      "end_line": 11,
+      "raw": "[Windows build and execution](docs/WindowsBuildAndRun.md)\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 12,
+      "end_line": 12,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 13,
+      "end_line": 15,
+      "raw": "Package release: **0.0.5** (2026-10-19). This patch packages the current\nsource snapshot; build, test and installation evidence is recorded in the SDK\npatch-release report. Earlier versioned feature notes remain historical.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 16,
+      "end_line": 17,
+      "raw": "\n\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "paragraph",
+      "start_line": 18,
+      "end_line": 18,
+      "raw": "A C++23 decision-making library that takes a Context and multiple Candidates and returns one Decision. Consumers request a decision through the `IDecisionMaker` contract. The core types do not depend on a particular game, NPC, or task system.\n"
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 19,
+      "end_line": 19,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 20,
+      "end_line": 20,
+      "raw": "**The product's purpose is precise probability calculation, with priority over fast responses.** It exhaustively calculates finite joint states without assuming that correlations are independent or arbitrarily excluding states with small probabilities. Numerical stability and verifiability take priority over throughput and latency.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 21,
+      "end_line": 21,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 22,
+      "end_line": 22,
+      "raw": "The minimal `IDecisionMaker`, `Candidate`, and `Decision` contracts are retained. Categorical observations have been added to `Context`, and an empty `Context{}` is also valid. `FirstCandidateDecisionMaker` returns the first candidate, while `ExactDecisionMaker` calculates conditional probabilities given the observed evidence. It uses a C++23 core and optional native acceleration SDKs. There is no Qt dependency.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 23,
+      "end_line": 23,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "paragraph",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "**Multiple available accelerators are used together within the bounds of preserving precision.** Direct execution paths for Metal, MLX, OpenCL, and Vulkan are available when their native SDKs are configured. Categorical evidence comparisons run on the device, while log-mass summation, conditional probabilities, and entropy retain the existing `long double` calculations. The number of devices and providers is not limited to one per platform. The actual execution path and CPU fallback execution are recorded in the report.\n"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 25,
+      "end_line": 25,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "html",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "<a id=\"10줄-사용-예제\"></a>\n"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 27,
+      "end_line": 27,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "heading",
+      "start_line": 28,
+      "end_line": 28,
+      "raw": "## 10-line usage example\n",
+      "level": 2,
+      "title": "10-line usage example"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 29,
+      "end_line": 29,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 30,
+      "end_line": 30,
+      "raw": "The code below is identical to the [executable example](examples/first_candidate.cpp)and prints `A`.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 31,
+      "end_line": 31,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "fenced_code",
+      "start_line": 32,
+      "end_line": 43,
+      "raw": "```cpp\n#include <iiDecision/FirstCandidateDecisionMaker.h>\n#include <array>\n#include <iostream>\nint main()\n{\n    const std::array candidates{iiDecision::Candidate{\"A\"}, iiDecision::Candidate{\"B\"}, iiDecision::Candidate{\"C\"}};\n    iiDecision::FirstCandidateDecisionMaker implementation;\n    iiDecision::IDecisionMaker& maker = implementation;\n    std::cout << maker.decide(iiDecision::Context{}, candidates).candidate_id << '\\n';\n}\n```\n",
+      "language": "cpp",
+      "code": "#include <iiDecision/FirstCandidateDecisionMaker.h>\n#include <array>\n#include <iostream>\nint main()\n{\n    const std::array candidates{iiDecision::Candidate{\"A\"}, iiDecision::Candidate{\"B\"}, iiDecision::Candidate{\"C\"}};\n    iiDecision::FirstCandidateDecisionMaker implementation;\n    iiDecision::IDecisionMaker& maker = implementation;\n    std::cout << maker.decide(iiDecision::Context{}, candidates).candidate_id << '\\n';\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 44,
+      "end_line": 44,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "html",
+      "start_line": 45,
+      "end_line": 45,
+      "raw": "<a id=\"빌드와-테스트\"></a>\n"
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 46,
+      "end_line": 46,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "heading",
+      "start_line": 47,
+      "end_line": 47,
+      "raw": "## Build and tests\n",
+      "level": 2,
+      "title": "Build and tests"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 48,
+      "end_line": 48,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "fenced_code",
+      "start_line": 49,
+      "end_line": 53,
+      "raw": "```sh\ncmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n```\n",
+      "language": "sh",
+      "code": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n",
+      "closed": true
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 54,
+      "end_line": 54,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "paragraph",
+      "start_line": 55,
+      "end_line": 55,
+      "raw": "Build artifacts are placed in `build/`. The tests include verification against independent 90-digit reference values using the standard `decimal` module in Python 3. Python is not a runtime dependency of the library. A static library is the default; a shared library can be built with `BUILD_SHARED_LIBS=ON`.\n"
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 56,
+      "end_line": 56,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "html",
+      "start_line": 57,
+      "end_line": 57,
+      "raw": "<a id=\"cmake-패키지-사용\"></a>\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 58,
+      "end_line": 58,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "heading",
+      "start_line": 59,
+      "end_line": 59,
+      "raw": "## Using the CMake package\n",
+      "level": 2,
+      "title": "Using the CMake package"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 60,
+      "end_line": 60,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "fenced_code",
+      "start_line": 61,
+      "end_line": 64,
+      "raw": "```cmake\nfind_package(iiDecision 0.0.5 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiDecision::iiDecision)\n```\n",
+      "language": "cmake",
+      "code": "find_package(iiDecision 0.0.5 CONFIG REQUIRED)\ntarget_link_libraries(my_app PRIVATE iiDecision::iiDecision)\n",
+      "closed": true
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 65,
+      "end_line": 65,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "The default installation path is `~/.local/SDK/iiDecision` and can be changed with `CMAKE_INSTALL_PREFIX` or `cmake --install build --prefix <path>`. The batch installer at the SDK root automatically discovers this project.\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 67,
+      "end_line": 67,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "html",
+      "start_line": 68,
+      "end_line": 68,
+      "raw": "<a id=\"확률-계산과-평가\"></a>\n"
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 69,
+      "end_line": 69,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "heading",
+      "start_line": 70,
+      "end_line": 70,
+      "raw": "## Probability calculation and evaluation\n",
+      "level": 2,
+      "title": "Probability calculation and evaluation"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 71,
+      "end_line": 71,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 72,
+      "end_line": 72,
+      "raw": "The [probability example](examples/probability.cpp)takes the joint states' log weights and observations as input. `ExactDecisionMaker::evaluate` returns all candidates' probabilities and log probabilities, the selection result, the log probability of the evidence, entropy, the normalization residual, and the number of linear-probability underflows. `decide` returns only the selection result from the same calculation through the existing contract.\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 73,
+      "end_line": 73,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "fenced_code",
+      "start_line": 74,
+      "end_line": 78,
+      "raw": "```cpp\nconst iiDecision::Context context{{{\"signal\", \"yes\"}}};\nconst auto prediction = maker.evaluate(context, candidates);\n// prediction.probabilities also contains every unselected candidate.\n```\n",
+      "language": "cpp",
+      "code": "const iiDecision::Context context{{{\"signal\", \"yes\"}}};\nconst auto prediction = maker.evaluate(context, candidates);\n// prediction.probabilities also contains every unselected candidate.\n",
+      "closed": true
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 79,
+      "end_line": 79,
+      "raw": "\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "paragraph",
+      "start_line": 80,
+      "end_line": 80,
+      "raw": "`evaluatePredictions` calculates accuracy, log loss, multiclass Brier score, reliability bins, ECE, and per-case scores for evaluation cases with ground-truth answers. Evaluation data separate from the data used for training or threshold adjustment must be used.\n"
+    },
+    {
+      "id": "b000050",
+      "kind": "blank",
+      "start_line": 81,
+      "end_line": 81,
+      "raw": "\n"
+    },
+    {
+      "id": "b000051",
+      "kind": "paragraph",
+      "start_line": 82,
+      "end_line": 82,
+      "raw": "The term exact in exhaustive calculation refers to the inference algorithm. Numbers are represented in `long double` floating point, and the actual number of mantissa bits on each platform is reported by `probability_mantissa_bits`. This does not mean arbitrary-precision calculation or a guarantee of real-world accuracy. Log probabilities are preserved even when linear probabilities underflow. Distribution concentration and numerical residuals are distinguished from calibration on real data.\n"
+    },
+    {
+      "id": "b000052",
+      "kind": "blank",
+      "start_line": 83,
+      "end_line": 83,
+      "raw": "\n"
+    },
+    {
+      "id": "b000053",
+      "kind": "html",
+      "start_line": 84,
+      "end_line": 84,
+      "raw": "<a id=\"네이티브-하드웨어-가속\"></a>\n"
+    },
+    {
+      "id": "b000054",
+      "kind": "blank",
+      "start_line": 85,
+      "end_line": 85,
+      "raw": "\n"
+    },
+    {
+      "id": "b000055",
+      "kind": "heading",
+      "start_line": 86,
+      "end_line": 86,
+      "raw": "## Native hardware acceleration\n",
+      "level": 2,
+      "title": "Native hardware acceleration"
+    },
+    {
+      "id": "b000056",
+      "kind": "blank",
+      "start_line": 87,
+      "end_line": 87,
+      "raw": "\n"
+    },
+    {
+      "id": "b000057",
+      "kind": "fenced_code",
+      "start_line": 88,
+      "end_line": 95,
+      "raw": "```cpp\nauto hardware = std::make_shared<iiDecision::EvidenceMatcher>();\niiDecision::ExactDecisionMaker maker(states, hardware);\nconst auto prediction = maker.evaluate(context, candidates);\nfor (const auto& run : prediction.execution.records) {\n    // run.backend_id, run.row_count, run.completed, run.diagnostic\n}\n```\n",
+      "language": "cpp",
+      "code": "auto hardware = std::make_shared<iiDecision::EvidenceMatcher>();\niiDecision::ExactDecisionMaker maker(states, hardware);\nconst auto prediction = maker.evaluate(context, candidates);\nfor (const auto& run : prediction.execution.records) {\n    // run.backend_id, run.row_count, run.completed, run.diagnostic\n}\n",
+      "closed": true
+    },
+    {
+      "id": "b000058",
+      "kind": "blank",
+      "start_line": 96,
+      "end_line": 96,
+      "raw": "\n"
+    },
+    {
+      "id": "b000059",
+      "kind": "paragraph",
+      "start_line": 97,
+      "end_line": 98,
+      "raw": "By default, state rows are distributed across the discovered accelerators and executed concurrently. Failed ranges are calculated on the CPU, and the causes of failure are recorded. To prohibit CPU fallback execution, use `AccelerationOptions::mode = ExecutionMode::RequireAccelerators`. Accelerator selection, provider options, plugin registration, platform-specific preparation, and verified limitations are described in\nthe [acceleration document](docs/Acceleration.md).\n"
+    },
+    {
+      "id": "b000060",
+      "kind": "blank",
+      "start_line": 99,
+      "end_line": 99,
+      "raw": "\n"
+    },
+    {
+      "id": "b000061",
+      "kind": "paragraph",
+      "start_line": 100,
+      "end_line": 104,
+      "raw": "The library options `IIDECISION_MLX` and `IIDECISION_OPENCL` accept `AUTO`,\n`ON`, or `OFF`. Existing `IIDECISION_METAL` and `IIDECISION_VULKAN` cache\nsettings no longer enable built-in backends; use the application adapter.\nONNX Runtime support has\nbeen removed. No provider plugins or model runtime are discovered for it.\n"
+    },
+    {
+      "id": "b000062",
+      "kind": "blank",
+      "start_line": 105,
+      "end_line": 105,
+      "raw": "\n"
+    },
+    {
+      "id": "b000063",
+      "kind": "heading",
+      "start_line": 106,
+      "end_line": 106,
+      "raw": "## Retired Laya model backend\n",
+      "level": 2,
+      "title": "Retired Laya model backend"
+    },
+    {
+      "id": "b000064",
+      "kind": "blank",
+      "start_line": 107,
+      "end_line": 107,
+      "raw": "\n"
+    },
+    {
+      "id": "b000065",
+      "kind": "paragraph",
+      "start_line": 108,
+      "end_line": 111,
+      "raw": "The previous learned Laya backend, exporter, downloader, and tokenizer build are\nretired. `LayaDecisionMaker::available()` returns false and constructing a model\nreports an explicit error. Exact probability calculation and the native evidence\ninterfaces remain available. See [the retirement contract](docs/RuntimeRetirement.md).\n"
+    },
+    {
+      "id": "b000066",
+      "kind": "blank",
+      "start_line": 112,
+      "end_line": 112,
+      "raw": "\n"
+    },
+    {
+      "id": "b000067",
+      "kind": "heading",
+      "start_line": 113,
+      "end_line": 113,
+      "raw": "## Evidence-aware RAG decisions\n",
+      "level": 2,
+      "title": "Evidence-aware RAG decisions"
+    },
+    {
+      "id": "b000068",
+      "kind": "blank",
+      "start_line": 114,
+      "end_line": 114,
+      "raw": "\n"
+    },
+    {
+      "id": "b000069",
+      "kind": "paragraph",
+      "start_line": 115,
+      "end_line": 119,
+      "raw": "`RagDecisionGate` converts relevance and answerability judgments into `Answer`,\n`RetrySearch`, or `Escalate`. Text and image evidence have separate runtime thresholds.\nAccepted evidence is ranked, merged into unique document/page citations, and bounded\nby a page budget. Reports retain every candidate, rejection reason, and policy revision.\n`run` performs at most one expanded retrieval before escalation.\n"
+    },
+    {
+      "id": "b000070",
+      "kind": "blank",
+      "start_line": 120,
+      "end_line": 120,
+      "raw": "\n"
+    },
+    {
+      "id": "b000071",
+      "kind": "fenced_code",
+      "start_line": 121,
+      "end_line": 131,
+      "raw": "```cpp\n#include <iiDecision/RagDecisionGate.h>\n#include <array>\n\nconst std::array evidence{\n    iiDecision::RagEvidence{\"passage\", \"guide\", 17,\n        iiDecision::EvidenceModality::Text, 0.9L, 0.95L}\n};\nconst auto report = iiDecision::RagDecisionGate{}.evaluate(evidence);\n// report.action == iiDecision::RagAction::Answer; cite report.pages.\n```\n",
+      "language": "cpp",
+      "code": "#include <iiDecision/RagDecisionGate.h>\n#include <array>\n\nconst std::array evidence{\n    iiDecision::RagEvidence{\"passage\", \"guide\", 17,\n        iiDecision::EvidenceModality::Text, 0.9L, 0.95L}\n};\nconst auto report = iiDecision::RagDecisionGate{}.evaluate(evidence);\n// report.action == iiDecision::RagAction::Answer; cite report.pages.\n",
+      "closed": true
+    },
+    {
+      "id": "b000072",
+      "kind": "blank",
+      "start_line": 132,
+      "end_line": 132,
+      "raw": "\n"
+    },
+    {
+      "id": "b000073",
+      "kind": "paragraph",
+      "start_line": 133,
+      "end_line": 136,
+      "raw": "The previous learned evidence scorer is retired with the Laya model backend.\n`RagDecisionGate` remains an independent contract for validated evidence supplied\nby supported application components. It performs no implicit model inference.\nSee the [RAG contract and examples](docs/AgenticRag.md).\n"
+    },
+    {
+      "id": "b000074",
+      "kind": "blank",
+      "start_line": 137,
+      "end_line": 137,
+      "raw": "\n"
+    },
+    {
+      "id": "b000075",
+      "kind": "paragraph",
+      "start_line": 138,
+      "end_line": 141,
+      "raw": "I/O and lifetime rules are defined in the [contract document](docs/Contract.md); formulas and precision policies in\nthe [probability-model document](docs/Probability.md); the review of materials and reasons for adoption in\nthe [research-review document](docs/Research.md); and TDD and package verification in\nthe [verification document](docs/Verification.md).\n"
+    },
+    {
+      "id": "b000076",
+      "kind": "blank",
+      "start_line": 142,
+      "end_line": 142,
+      "raw": "\n"
+    },
+    {
+      "id": "b000077",
+      "kind": "heading",
+      "start_line": 143,
+      "end_line": 143,
+      "raw": "## License\n",
+      "level": 2,
+      "title": "License"
+    },
+    {
+      "id": "b000078",
+      "kind": "blank",
+      "start_line": 144,
+      "end_line": 144,
+      "raw": "\n"
+    },
+    {
+      "id": "b000079",
+      "kind": "paragraph",
+      "start_line": 145,
+      "end_line": 145,
+      "raw": "SPDX-License-Identifier: MIT\n"
+    },
+    {
+      "id": "b000080",
+      "kind": "blank",
+      "start_line": 146,
+      "end_line": 146,
+      "raw": "\n"
+    },
+    {
+      "id": "b000081",
+      "kind": "paragraph",
+      "start_line": 147,
+      "end_line": 149,
+      "raw": "The original code and documentation in this repository are licensed under the\n[MIT License](LICENSE). Third-party code, libraries, fonts, tools, and model\nweights retain their respective licenses.\n"
+    },
+    {
+      "id": "b000082",
+      "kind": "blank",
+      "start_line": 150,
+      "end_line": 150,
+      "raw": "\n"
+    },
+    {
+      "id": "b000083",
+      "kind": "html",
+      "start_line": 151,
+      "end_line": 151,
+      "raw": "<!-- workspace-docs:readme:start -->\n"
+    },
+    {
+      "id": "b000084",
+      "kind": "heading",
+      "start_line": 152,
+      "end_line": 152,
+      "raw": "## Documentation entry points\n",
+      "level": 2,
+      "title": "Documentation entry points"
+    },
+    {
+      "id": "b000085",
+      "kind": "blank",
+      "start_line": 153,
+      "end_line": 153,
+      "raw": "\n"
+    },
+    {
+      "id": "b000086",
+      "kind": "list",
+      "start_line": 154,
+      "end_line": 157,
+      "raw": "- Human overview: this English `README.md`.\n- Agent instructions: [AGENT.md](AGENT.md).\n- Human documentation: [documentation index](docs/README.md).\n- Structured agent documentation: [agent index](docs/agent-index.json).\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "Human overview: this English `README.md`.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Agent instructions: [AGENT.md](AGENT.md).",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Human documentation: [documentation index](docs/README.md).",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "Structured agent documentation: [agent index](docs/agent-index.json).",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000087",
+      "kind": "html",
+      "start_line": 158,
+      "end_line": 158,
+      "raw": "<!-- workspace-docs:readme:end -->\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "iiDecision 0.0.5",
+      "anchor": "iidecision-005",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000019",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "10-line usage example",
+      "anchor": "10-line-usage-example",
+      "start_line": 28
+    },
+    {
+      "block_id": "b000027",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Build and tests",
+      "anchor": "build-and-tests",
+      "start_line": 47
+    },
+    {
+      "block_id": "b000035",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Using the CMake package",
+      "anchor": "using-the-cmake-package",
+      "start_line": 59
+    },
+    {
+      "block_id": "b000043",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Probability calculation and evaluation",
+      "anchor": "probability-calculation-and-evaluation",
+      "start_line": 70
+    },
+    {
+      "block_id": "b000055",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Native hardware acceleration",
+      "anchor": "native-hardware-acceleration",
+      "start_line": 86
+    },
+    {
+      "block_id": "b000063",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Retired Laya model backend",
+      "anchor": "retired-laya-model-backend",
+      "start_line": 106
+    },
+    {
+      "block_id": "b000067",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Evidence-aware RAG decisions",
+      "anchor": "evidence-aware-rag-decisions",
+      "start_line": 113
+    },
+    {
+      "block_id": "b000077",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "License",
+      "anchor": "license",
+      "start_line": 143
+    },
+    {
+      "block_id": "b000084",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "Documentation entry points",
+      "anchor": "documentation-entry-points",
+      "start_line": 152
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000003",
+        "line": 9,
+        "text": "backends must register the adapter. See [the native acceleration contract](docs/Acceleration.md).",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000009",
+        "line": 18,
+        "text": "A C++23 decision-making library that takes a Context and multiple Candidates and returns one Decision. Consumers request a decision through the `IDecisionMaker` contract. The core types do not depend on a particular game, NPC, or task system.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000049",
+        "line": 80,
+        "text": "`evaluatePredictions` calculates accuracy, log loss, multiclass Brier score, reliability bins, ECE, and per-case scores for evaluation cases with ground-truth answers. Evaluation data separate from the data used for training or threshold adjustment must be used.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [
+      {
+        "block_id": "b000029",
+        "language": "sh",
+        "code": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n"
+      }
+    ],
+    "links": [
+      {
+        "block_id": "b000003",
+        "label": "GPU application adapter",
+        "target": "examples/gpu-adapter",
+        "kind": "relative",
+        "line": 4
+      },
+      {
+        "block_id": "b000003",
+        "label": "the native acceleration contract",
+        "target": "docs/Acceleration.md",
+        "kind": "relative",
+        "line": 9
+      },
+      {
+        "block_id": "b000005",
+        "label": "Windows build and execution",
+        "target": "docs/WindowsBuildAndRun.md",
+        "kind": "relative",
+        "line": 11
+      },
+      {
+        "block_id": "b000021",
+        "label": "executable example",
+        "target": "examples/first_candidate.cpp",
+        "kind": "relative",
+        "line": 30
+      },
+      {
+        "block_id": "b000045",
+        "label": "probability example",
+        "target": "examples/probability.cpp",
+        "kind": "relative",
+        "line": 72
+      },
+      {
+        "block_id": "b000059",
+        "label": "acceleration document",
+        "target": "docs/Acceleration.md",
+        "kind": "relative",
+        "line": 98
+      },
+      {
+        "block_id": "b000065",
+        "label": "the retirement contract",
+        "target": "docs/RuntimeRetirement.md",
+        "kind": "relative",
+        "line": 111
+      },
+      {
+        "block_id": "b000073",
+        "label": "RAG contract and examples",
+        "target": "docs/AgenticRag.md",
+        "kind": "relative",
+        "line": 136
+      },
+      {
+        "block_id": "b000075",
+        "label": "contract document",
+        "target": "docs/Contract.md",
+        "kind": "relative",
+        "line": 138
+      },
+      {
+        "block_id": "b000075",
+        "label": "probability-model document",
+        "target": "docs/Probability.md",
+        "kind": "relative",
+        "line": 139
+      },
+      {
+        "block_id": "b000075",
+        "label": "research-review document",
+        "target": "docs/Research.md",
+        "kind": "relative",
+        "line": 140
+      },
+      {
+        "block_id": "b000075",
+        "label": "verification document",
+        "target": "docs/Verification.md",
+        "kind": "relative",
+        "line": 141
+      },
+      {
+        "block_id": "b000081",
+        "label": "MIT License",
+        "target": "LICENSE",
+        "kind": "relative",
+        "line": 148
+      },
+      {
+        "block_id": "b000086",
+        "label": "AGENT.md",
+        "target": "AGENT.md",
+        "kind": "relative",
+        "line": 155
+      },
+      {
+        "block_id": "b000086",
+        "label": "documentation index",
+        "target": "docs/README.md",
+        "kind": "relative",
+        "line": 156
+      },
+      {
+        "block_id": "b000086",
+        "label": "agent index",
+        "target": "docs/agent-index.json",
+        "kind": "relative",
+        "line": 157
+      }
+    ],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

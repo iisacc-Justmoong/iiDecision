@@ -49,8 +49,9 @@ struct LayaAnswer {
     ExecutionReport execution;
 };
 
-// Local ONNX inference using the official Laya sequence and decoding contracts.
-// A package contains laya.onnx, rl_agent_config.json and tokenizer/{tokenizer,
+// Compatibility interface: the previous learned model backend is retired.
+// Retained types allow a future independent implementation; available() is false.
+// Historical package layouts are unsupported. tokenizer/{tokenizer,
 // tokenizer_config}.json. Python is used only to prepare the package.
 class LayaDecisionMaker final : public IDecisionMaker {
 public:

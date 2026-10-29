@@ -1,0 +1,114 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:ec781d628fc0b1eff8b439ae40b158503d811f0657ebe99c5979c66cadb5dcb2",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Laya.md",
+    "sha256": "da2f428f20fc5c47d321019fe9227be37faa28b60527ac14cb4007fd5e04e950",
+    "bytes": 962,
+    "line_count": 14,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "Laya 모델 백엔드 폐기",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# Laya 모델 백엔드 폐기\n",
+      "level": 1,
+      "title": "Laya 모델 백엔드 폐기"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 5,
+      "raw": "ONNX 기반 Laya 실행, 변환·다운로드 도구와 토크나이저 빌드를 제거하였다.\n`LayaDecisionMaker::available()`은 false이며 모델 생성자는 명시적 폐기 오류를\n반환한다. 모델 파일을 읽거나 다른 의사결정 방식으로 암묵적으로 대체하지 않는다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 6,
+      "end_line": 6,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 7,
+      "end_line": 10,
+      "raw": "기존 공개 데이터 객체와 진입점은 실패 처리를 위해 보존한다. 실제 의사결정은\n`IDecisionMaker`, `ExactDecisionMaker`, `FirstCandidateDecisionMaker`와\n`IEvidenceBackend`를 통해 구현을 선택한다. 유한 상태의 확률 계산과 RAG 게이트는\n이 폐기된 학습 모델과 독립적이다.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 11,
+      "end_line": 11,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 12,
+      "end_line": 14,
+      "raw": "`iiDecision.Laya.Retired`는 가용성·요청 거절·백엔드 목록을 검사한다. 확률·RAG·\n네이티브 가속은 별도 테스트로 검증한다. 과거 Laya의 확률 비교 결과를 현재 모델\n지원이나 다른 엔진의 동등성 증거로 사용하지 않는다.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "Laya 모델 백엔드 폐기",
+      "anchor": "laya-모델-백엔드-폐기",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000003",
+        "line": 5,
+        "text": "반환한다. 모델 파일을 읽거나 다른 의사결정 방식으로 암묵적으로 대체하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000007",
+        "line": 14,
+        "text": "지원이나 다른 엔진의 동등성 증거로 사용하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

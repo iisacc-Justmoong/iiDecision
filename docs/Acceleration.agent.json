@@ -1,0 +1,755 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:8ee0d05a8bcfc06b30aca71eb92a9d74491ae9e67d9b8ea1421a578b813da79b",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/Acceleration.md",
+    "sha256": "2ca2edc02e895c496de98ced2c3cbdc933521a3223b522a977ad72c0a3f10cd0",
+    "bytes": 10035,
+    "line_count": 154,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "네이티브 가속과 정밀도 계약",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# 네이티브 가속과 정밀도 계약\n",
+      "level": 1,
+      "title": "네이티브 가속과 정밀도 계약"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "heading",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "## 목적과 계산 경계\n",
+      "level": 2,
+      "title": "목적과 계산 경계"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 5,
+      "end_line": 8,
+      "raw": "iiDecision의 제품 목적은 낮은 지연시간보다 정밀한 의사결정 확률 계산이다.\n가속을 켜도 전수 상태의 상관관계, 희소 질량, 로그 확률, 후보 순서에 따른\n동률 규칙을 보존한다. GPU·NPU 사용을 이유로 확률 가중치를 FP16·FP32로\n변환하거나 작은 확률을 버리지 않는다.\n"
+    },
+    {
+      "id": "b000006",
+      "kind": "blank",
+      "start_line": 9,
+      "end_line": 9,
+      "raw": "\n"
+    },
+    {
+      "id": "b000007",
+      "kind": "paragraph",
+      "start_line": 10,
+      "end_line": 10,
+      "raw": "현재 실제 계산 경계는 다음과 같다.\n"
+    },
+    {
+      "id": "b000008",
+      "kind": "blank",
+      "start_line": 11,
+      "end_line": 11,
+      "raw": "\n"
+    },
+    {
+      "id": "b000009",
+      "kind": "list",
+      "start_line": 12,
+      "end_line": 17,
+      "raw": "1. 모델 구성 시 문자열 관측값을 키별 `uint32_t` 범주 ID로 인코딩한다.\n2. 관측한 열만 모아 각 상태가 증거와 일치하는지 장치에서 계산한다.\n3. 장치 작업 완료를 기다리고 상태마다 정확한 0·1 마스크를 받는다.\n4. 원래 상태 순서로 마스크를 병합한다.\n5. 로그 질량 합산·조건부 확률·엔트로피·정규화 잔차는 호스트의 기존\n   `long double`·보상 합산·log-sum-exp 구현으로 계산한다.\n",
+      "items": [
+        {
+          "marker": "1.",
+          "text": "모델 구성 시 문자열 관측값을 키별 `uint32_t` 범주 ID로 인코딩한다.",
+          "checked": null
+        },
+        {
+          "marker": "2.",
+          "text": "관측한 열만 모아 각 상태가 증거와 일치하는지 장치에서 계산한다.",
+          "checked": null
+        },
+        {
+          "marker": "3.",
+          "text": "장치 작업 완료를 기다리고 상태마다 정확한 0·1 마스크를 받는다.",
+          "checked": null
+        },
+        {
+          "marker": "4.",
+          "text": "원래 상태 순서로 마스크를 병합한다.",
+          "checked": null
+        },
+        {
+          "marker": "5.",
+          "text": "로그 질량 합산·조건부 확률·엔트로피·정규화 잔차는 호스트의 기존",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000010",
+      "kind": "blank",
+      "start_line": 18,
+      "end_line": 18,
+      "raw": "\n"
+    },
+    {
+      "id": "b000011",
+      "kind": "paragraph",
+      "start_line": 19,
+      "end_line": 22,
+      "raw": "따라서 확률 합산 전체를 GPU에 옮긴 구현은 아니다. NPU의 낮은 부동소수점\n정밀도와 기존 확률 계약을 함께 만족시키기 위해 증거 필터링을 가속한다.\n현재 작은 모델에서 속도가 개선된다는 보장은 없으며, 장치 초기화·복사·그래프\n컴파일 비용이 더 클 수 있다. 처리 시간보다 계산 결과 보존을 우선한다.\n"
+    },
+    {
+      "id": "b000012",
+      "kind": "blank",
+      "start_line": 23,
+      "end_line": 23,
+      "raw": "\n"
+    },
+    {
+      "id": "b000013",
+      "kind": "paragraph",
+      "start_line": 24,
+      "end_line": 24,
+      "raw": "직접 Metal·MLX·OpenCL·Vulkan 경로는 정수 비교를 실행한다. ONNX 경로와 제공자 설정은 폐기하였다.\n"
+    },
+    {
+      "id": "b000014",
+      "kind": "blank",
+      "start_line": 25,
+      "end_line": 25,
+      "raw": "\n"
+    },
+    {
+      "id": "b000015",
+      "kind": "heading",
+      "start_line": 26,
+      "end_line": 26,
+      "raw": "## 제공되는 실제 실행 경로\n",
+      "level": 2,
+      "title": "제공되는 실제 실행 경로"
+    },
+    {
+      "id": "b000016",
+      "kind": "blank",
+      "start_line": 27,
+      "end_line": 27,
+      "raw": "\n"
+    },
+    {
+      "id": "b000017",
+      "kind": "heading",
+      "start_line": 28,
+      "end_line": 28,
+      "raw": "### iiGPU 공통 명령 계층\n",
+      "level": 3,
+      "title": "iiGPU 공통 명령 계층"
+    },
+    {
+      "id": "b000018",
+      "kind": "blank",
+      "start_line": 29,
+      "end_line": 29,
+      "raw": "\n"
+    },
+    {
+      "id": "b000019",
+      "kind": "paragraph",
+      "start_line": 30,
+      "end_line": 34,
+      "raw": "Metal·Vulkan의 네이티브 장치·큐·버퍼·파이프라인·장벽·완료 대기는 독립 모듈\niiGPU 0.1 이상이 소유한다. 별도 소비자 프로젝트 `examples/gpu-adapter/`는 정확한\nuint32 증거 커널·형상·마스크 해석을 제공하고 앱이 `IEvidenceBackend`로 주입한다.\nMetal·Vulkan backend ID는\n기존의 `metal/<index>`, `vulkan/<index>`를 유지한다.\n"
+    },
+    {
+      "id": "b000020",
+      "kind": "blank",
+      "start_line": 35,
+      "end_line": 35,
+      "raw": "\n"
+    },
+    {
+      "id": "b000021",
+      "kind": "paragraph",
+      "start_line": 36,
+      "end_line": 41,
+      "raw": "동일 backend 슬롯은 기존 EvidenceMatcher 잠금으로 직렬화한다. 컴퓨트\n파이프라인을 한 번 만들고 행렬·쿼리·출력 버퍼는 용량이 충분하면 재사용한다.\n어댑터 자체도 접근을 직렬화하므로 동일 백엔드 인스턴스를 여러 matcher가\n공유할 때 재사용 버퍼가 서로 덮어쓰이지 않는다.\n행 수가 커지거나 작아져도 현재 유효한 범위를 바인딩하고 그 범위만 읽는다.\nGPU 완료를 확인하기 전에 호스트가 버퍼를 덮어쓰지 않는다.\n"
+    },
+    {
+      "id": "b000022",
+      "kind": "blank",
+      "start_line": 42,
+      "end_line": 42,
+      "raw": "\n"
+    },
+    {
+      "id": "b000023",
+      "kind": "paragraph",
+      "start_line": 43,
+      "end_line": 48,
+      "raw": "iiDecision 라이브러리는 iiGPU를 찾거나 링크하지 않는다. 애플리케이션이 두\n패키지를 각각 찾고 어댑터의 `discover` 결과를 생성자의 `additional_backends`로\n공급한다. 기존 `IIDECISION_METAL`·`IIDECISION_VULKAN` 캐시 값은 더 이상 내장\n백엔드를 활성화하지 않으며 `ON`은 구성 시 경고한다. 이전 자동 탐색에 의존하던\n앱은 이 등록 절차를 추가하고 다시 빌드해야 한다. iiDecision 공개 API에는\niiGPU나 네이티브 플랫폼 자료형을 추가하지 않는다.\n"
+    },
+    {
+      "id": "b000024",
+      "kind": "blank",
+      "start_line": 49,
+      "end_line": 49,
+      "raw": "\n"
+    },
+    {
+      "id": "b000025",
+      "kind": "fenced_code",
+      "start_line": 50,
+      "end_line": 56,
+      "raw": "```sh\ncmake -S examples/gpu-adapter -B build/gpu-adapter \\\n  -DiiDecision_DIR=\"$HOME/.local/SDK/iiDecision/lib/cmake/iiDecision\" \\\n  -DiiGPU_DIR=\"$HOME/.local/SDK/iiGPU/lib/cmake/iiGPU\"\ncmake --build build/gpu-adapter\nctest --test-dir build/gpu-adapter --output-on-failure\n```\n",
+      "language": "sh",
+      "code": "cmake -S examples/gpu-adapter -B build/gpu-adapter \\\n  -DiiDecision_DIR=\"$HOME/.local/SDK/iiDecision/lib/cmake/iiDecision\" \\\n  -DiiGPU_DIR=\"$HOME/.local/SDK/iiGPU/lib/cmake/iiGPU\"\ncmake --build build/gpu-adapter\nctest --test-dir build/gpu-adapter --output-on-failure\n",
+      "closed": true
+    },
+    {
+      "id": "b000026",
+      "kind": "blank",
+      "start_line": 57,
+      "end_line": 57,
+      "raw": "\n"
+    },
+    {
+      "id": "b000027",
+      "kind": "paragraph",
+      "start_line": 58,
+      "end_line": 60,
+      "raw": "이 별도 소비자 프로젝트와 장치 테스트 소스는 설치 패키지의\n`share/iiDecision/examples/gpu-adapter/`에도 포함된다. 실제 실행은 장치가\n필요하며 단독 라이브러리의 빌드와 구분한다.\n"
+    },
+    {
+      "id": "b000028",
+      "kind": "blank",
+      "start_line": 61,
+      "end_line": 61,
+      "raw": "\n"
+    },
+    {
+      "id": "b000029",
+      "kind": "paragraph",
+      "start_line": 62,
+      "end_line": 65,
+      "raw": "별도 어댑터 소비자의 네이티브 실행 검사는 `Acceleration.metal`, `Acceleration.vulkan`을 사용하고,\n추가한 `Acceleration.metal_reuse`, `Acceleration.vulkan_reuse`는 같은 matcher에서\n1·65·3·1025·17·259행을 순서대로 처리해 버퍼 재사용과 정확한 마스크를 검증한다.\nCPU 대체 실행은 0행이어야 하며 기존 정밀도·희소 확률·동률 검증도 유지한다.\n"
+    },
+    {
+      "id": "b000030",
+      "kind": "blank",
+      "start_line": 66,
+      "end_line": 66,
+      "raw": "\n"
+    },
+    {
+      "id": "b000031",
+      "kind": "table",
+      "start_line": 67,
+      "end_line": 73,
+      "raw": "| 경로 | 실행 구현 | 장치와 플랫폼 범위 |\n| --- | --- | --- |\n| Metal | MSL 정수 compute kernel, 버퍼 업로드·dispatch·완료 확인·읽기 | macOS의 발견한 모든 Metal 장치, iOS의 기본 Metal 장치 |\n| MLX C++ | GPU stream에서 uint32 `equal`과 행별 `all`, 명시적 `eval` | 설치된 MLX가 제공하는 Metal 또는 CUDA GPU 전체 |\n| OpenCL 1.2+ | 정수 kernel 빌드, 모든 플랫폼·장치 열거, queue 실행·동기 읽기 | macOS, Windows, Linux와 지원되는 임베디드 드라이버 |\n| Vulkan 1.1+ | SPIR-V 정수 compute pipeline, descriptor·buffer·fence·호스트 읽기 | Windows, Linux, Android, MoltenVK를 설치한 Apple 플랫폼 |\n| C++23 CPU | 정확한 uint32 비교 | 위 SDK가 없는 플랫폼을 포함한 C++23 대상 |\n",
+      "columns": [
+        "경로",
+        "실행 구현",
+        "장치와 플랫폼 범위"
+      ],
+      "rows": [
+        [
+          "Metal",
+          "MSL 정수 compute kernel, 버퍼 업로드·dispatch·완료 확인·읽기",
+          "macOS의 발견한 모든 Metal 장치, iOS의 기본 Metal 장치"
+        ],
+        [
+          "MLX C++",
+          "GPU stream에서 uint32 `equal`과 행별 `all`, 명시적 `eval`",
+          "설치된 MLX가 제공하는 Metal 또는 CUDA GPU 전체"
+        ],
+        [
+          "OpenCL 1.2+",
+          "정수 kernel 빌드, 모든 플랫폼·장치 열거, queue 실행·동기 읽기",
+          "macOS, Windows, Linux와 지원되는 임베디드 드라이버"
+        ],
+        [
+          "Vulkan 1.1+",
+          "SPIR-V 정수 compute pipeline, descriptor·buffer·fence·호스트 읽기",
+          "Windows, Linux, Android, MoltenVK를 설치한 Apple 플랫폼"
+        ],
+        [
+          "C++23 CPU",
+          "정확한 uint32 비교",
+          "위 SDK가 없는 플랫폼을 포함한 C++23 대상"
+        ]
+      ]
+    },
+    {
+      "id": "b000032",
+      "kind": "blank",
+      "start_line": 74,
+      "end_line": 74,
+      "raw": "\n"
+    },
+    {
+      "id": "b000033",
+      "kind": "paragraph",
+      "start_line": 75,
+      "end_line": 79,
+      "raw": "MLX의 공식 설치 문서는 Metal 및 CUDA 빌드 경로를 제공한다.\n[MLX 공식 문서](https://ml-explore.github.io/mlx/build/html/install.html).\nOpenCL과 Vulkan의 실행·동기화 계약은 Khronos 규격에 따른다.\n[OpenCL API](https://registry.khronos.org/OpenCL/specs/unified/html/OpenCL_API.html),\n[Vulkan 명세](https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html).\n"
+    },
+    {
+      "id": "b000034",
+      "kind": "blank",
+      "start_line": 80,
+      "end_line": 80,
+      "raw": "\n"
+    },
+    {
+      "id": "b000035",
+      "kind": "heading",
+      "start_line": 81,
+      "end_line": 81,
+      "raw": "## 선택, 동시 실행과 실패 처리\n",
+      "level": 2,
+      "title": "선택, 동시 실행과 실패 처리"
+    },
+    {
+      "id": "b000036",
+      "kind": "blank",
+      "start_line": 82,
+      "end_line": 82,
+      "raw": "\n"
+    },
+    {
+      "id": "b000037",
+      "kind": "fenced_code",
+      "start_line": 83,
+      "end_line": 94,
+      "raw": "```cpp\n#include \"GpuAdapter.h\" // 애플리케이션의 어댑터 소스\nauto metal = iiDecision::gpu_adapter::discover(iiDecision::gpu_adapter::GpuApi::metal);\nauto vulkan = iiDecision::gpu_adapter::discover(iiDecision::gpu_adapter::GpuApi::vulkan);\nmetal.insert(metal.end(), vulkan.begin(), vulkan.end());\niiDecision::AccelerationOptions options;\noptions.mode = iiDecision::ExecutionMode::RequireAccelerators;\noptions.backend_ids = {\"metal/0\"};\nauto hardware = std::make_shared<iiDecision::EvidenceMatcher>(options, metal);\niiDecision::ExactDecisionMaker model(states, hardware);\nconst auto result = model.evaluate(context, candidates);\n```\n",
+      "language": "cpp",
+      "code": "#include \"GpuAdapter.h\" // 애플리케이션의 어댑터 소스\nauto metal = iiDecision::gpu_adapter::discover(iiDecision::gpu_adapter::GpuApi::metal);\nauto vulkan = iiDecision::gpu_adapter::discover(iiDecision::gpu_adapter::GpuApi::vulkan);\nmetal.insert(metal.end(), vulkan.begin(), vulkan.end());\niiDecision::AccelerationOptions options;\noptions.mode = iiDecision::ExecutionMode::RequireAccelerators;\noptions.backend_ids = {\"metal/0\"};\nauto hardware = std::make_shared<iiDecision::EvidenceMatcher>(options, metal);\niiDecision::ExactDecisionMaker model(states, hardware);\nconst auto result = model.evaluate(context, candidates);\n",
+      "closed": true
+    },
+    {
+      "id": "b000038",
+      "kind": "blank",
+      "start_line": 95,
+      "end_line": 95,
+      "raw": "\n"
+    },
+    {
+      "id": "b000039",
+      "kind": "paragraph",
+      "start_line": 96,
+      "end_line": 98,
+      "raw": "ID는 `backends()`로 확인한 값을 사용한다. `available`은 장치 또는 제공자를\n발견하였음을 나타내며, 해당 그래프를 실행할 수 있다는 보장은 아니다. SDK가\n빠졌거나 초기화에 실패한 경로도 진단과 함께 반환한다.\n"
+    },
+    {
+      "id": "b000040",
+      "kind": "blank",
+      "start_line": 99,
+      "end_line": 99,
+      "raw": "\n"
+    },
+    {
+      "id": "b000041",
+      "kind": "list",
+      "start_line": 100,
+      "end_line": 104,
+      "raw": "- `CpuOnly`: 네이티브 가속 초기화 없이 CPU로 계산한다.\n- `PreferAccelerators`: 기본값이다. 발견한 CPU 외의 모든 실행 경로를 선택한다.\n  `backend_ids`를 지정하면 그 목록만 선택한다. 실패한 구간만 CPU로 계산한다.\n- `RequireAccelerators`: 선택 경로의 실패나 가속기 부재가 오류가 된다.\n  명시적으로 CPU를 선택하여 이 조건을 우회할 수 없다.\n",
+      "items": [
+        {
+          "marker": "-",
+          "text": "`CpuOnly`: 네이티브 가속 초기화 없이 CPU로 계산한다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`PreferAccelerators`: 기본값이다. 발견한 CPU 외의 모든 실행 경로를 선택한다.",
+          "checked": null
+        },
+        {
+          "marker": "-",
+          "text": "`RequireAccelerators`: 선택 경로의 실패나 가속기 부재가 오류가 된다.",
+          "checked": null
+        }
+      ]
+    },
+    {
+      "id": "b000042",
+      "kind": "blank",
+      "start_line": 105,
+      "end_line": 105,
+      "raw": "\n"
+    },
+    {
+      "id": "b000043",
+      "kind": "paragraph",
+      "start_line": 106,
+      "end_line": 109,
+      "raw": "선택 경로들에 연속 상태 구간을 균등 분배하고 `std::async`로 실행한다. 행보다\n경로가 많으면 앞의 경로부터 행 수만큼만 사용한다. 같은 물리 GPU에 Metal·MLX·\nOpenCL·Vulkan 경로를 함께 실행하면 동일 하드웨어를 공유하므로 병렬 속도 향상을\n보장하지 않는다. 원하는 경로만 지정하여 물리 장치 중복과 초기화 비용을 조정한다.\n"
+    },
+    {
+      "id": "b000044",
+      "kind": "blank",
+      "start_line": 110,
+      "end_line": 110,
+      "raw": "\n"
+    },
+    {
+      "id": "b000045",
+      "kind": "paragraph",
+      "start_line": 111,
+      "end_line": 114,
+      "raw": "`ExecutionRecord`에는 경로 ID·시작 행·행 수·완료 여부·실패 원인을 기록한다.\n기본 모드의 CPU 대체 실행은 별도 `cpu` 기록과 `cpu_rows`로 확인한다. 빈 증거는\n모든 상태가 일치하는 항등 연산이므로 장치를 실행하지 않으며 엄격 모드에서도\n유효하다. 빈 배치는 실행 기록 없이 빈 마스크를 반환한다.\n"
+    },
+    {
+      "id": "b000046",
+      "kind": "blank",
+      "start_line": 115,
+      "end_line": 115,
+      "raw": "\n"
+    },
+    {
+      "id": "b000047",
+      "kind": "paragraph",
+      "start_line": 116,
+      "end_line": 120,
+      "raw": "각 `EvidenceMatcher` 인스턴스는 공유 구현으로 복사할 수 있다. 같은 인스턴스의\n백엔드 호출은 잠금으로 직렬화하고 서로 다른 백엔드의 구간은 동시에 실행한다.\nMLX의 lazy graph·stream 작업은 MLX 전역 잠금으로 보호한다. 추가로 전달한\n사용자 백엔드를 서로 다른 matcher에 공유하면 그 백엔드의 동시 호출 안전성은\n구현자가 보장해야 한다. 외부 백엔드는 입력 span을 반환 이후에 보관해서는 안 된다.\n"
+    },
+    {
+      "id": "b000048",
+      "kind": "blank",
+      "start_line": 121,
+      "end_line": 121,
+      "raw": "\n"
+    },
+    {
+      "id": "b000049",
+      "kind": "heading",
+      "start_line": 122,
+      "end_line": 122,
+      "raw": "## 빌드와 의존성\n",
+      "level": 2,
+      "title": "빌드와 의존성"
+    },
+    {
+      "id": "b000050",
+      "kind": "blank",
+      "start_line": 123,
+      "end_line": 123,
+      "raw": "\n"
+    },
+    {
+      "id": "b000051",
+      "kind": "paragraph",
+      "start_line": 124,
+      "end_line": 126,
+      "raw": "`IIDECISION_MLX`, `IIDECISION_OPENCL`은\n`AUTO`, `ON`, `OFF`를 지원한다. `ON`은 필요한 네이티브 SDK가 없으면 구성 오류를\n반환한다. ONNX 제공자·플러그인 설정과 다운로드 도구는 폐기하였다.\n"
+    },
+    {
+      "id": "b000052",
+      "kind": "blank",
+      "start_line": 127,
+      "end_line": 127,
+      "raw": "\n"
+    },
+    {
+      "id": "b000053",
+      "kind": "fenced_code",
+      "start_line": 128,
+      "end_line": 132,
+      "raw": "```sh\ncmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMLX_DIR=/path/to/mlx/share/cmake/MLX\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n```\n",
+      "language": "sh",
+      "code": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMLX_DIR=/path/to/mlx/share/cmake/MLX\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n",
+      "closed": true
+    },
+    {
+      "id": "b000054",
+      "kind": "blank",
+      "start_line": 133,
+      "end_line": 133,
+      "raw": "\n"
+    },
+    {
+      "id": "b000055",
+      "kind": "paragraph",
+      "start_line": 134,
+      "end_line": 136,
+      "raw": "Metal·Vulkan 경로는 앱 어댑터가 iiGPU의 장치·버퍼·명령 인터페이스를 사용한다. 여러 SDK를\n함께 소비할 때 같은 MLX 패키지를 선택하고, 명시적으로 선택한 라이브러리와\n실제로 로딩한 파일의 일치를 확인한다. CPU 확률 계산과 장치 실행 증거는 구분한다.\n"
+    },
+    {
+      "id": "b000056",
+      "kind": "blank",
+      "start_line": 137,
+      "end_line": 137,
+      "raw": "\n"
+    },
+    {
+      "id": "b000057",
+      "kind": "heading",
+      "start_line": 138,
+      "end_line": 138,
+      "raw": "## 검증 범위\n",
+      "level": 2,
+      "title": "검증 범위"
+    },
+    {
+      "id": "b000058",
+      "kind": "blank",
+      "start_line": 139,
+      "end_line": 139,
+      "raw": "\n"
+    },
+    {
+      "id": "b000059",
+      "kind": "paragraph",
+      "start_line": 140,
+      "end_line": 141,
+      "raw": "다음 장치 실행 기록은 어댑터 분리 전의 이력이다. 새 소비자 프로젝트의\n실제 장치 실행은 별도의 검증이며 단독 빌드나 소비자 컴파일만으로 증명하지 않는다.\n"
+    },
+    {
+      "id": "b000060",
+      "kind": "blank",
+      "start_line": 142,
+      "end_line": 142,
+      "raw": "\n"
+    },
+    {
+      "id": "b000061",
+      "kind": "paragraph",
+      "start_line": 143,
+      "end_line": 146,
+      "raw": "macOS arm64의 Apple M1 Max에서 여섯 경로의 실제 실행과 함께 동시 구간 실행을\n확인하였다. 각 경로는 큰 uint32 ID와 259개 행의 꼬리 구간을 검증하며,\n80개 추론 사례에서 정밀 CPU 결과와 전체 보고서 수치가 동일하였다.\n이는 CoreML 제공자 실행 증거이며 ANE 실행 증거는 아니다.\n"
+    },
+    {
+      "id": "b000062",
+      "kind": "blank",
+      "start_line": 147,
+      "end_line": 147,
+      "raw": "\n"
+    },
+    {
+      "id": "b000063",
+      "kind": "paragraph",
+      "start_line": 148,
+      "end_line": 154,
+      "raw": "가속 없는 구성, 정적·공유 라이브러리, 설치 소비 프로젝트 및 iOS arm64 Metal\n크로스 빌드를 검증한다. 테스트가 사용할 하드웨어를 찾지 못하면 CTest에\n`Skipped`를 반환하며 성공한 GPU 테스트로 세지 않는다.\nWindows·Linux·Android 및 각 벤더 GPU·NPU의 물리 장치 실행은 현재 머신에서\n확인하지 못하였다. 수동 실행 가능한 `native-build.yml`은 데스크톱 빌드·테스트와\nAndroid·iOS 크로스 빌드를 정의하며, 이번 작업에서 호스팅 실행을 수행하지 않았다.\n최종 구성별 결과는 [검증 문서](Verification.md)에 기록한다.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "네이티브 가속과 정밀도 계약",
+      "anchor": "네이티브-가속과-정밀도-계약",
+      "start_line": 1
+    },
+    {
+      "block_id": "b000003",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "목적과 계산 경계",
+      "anchor": "목적과-계산-경계",
+      "start_line": 3
+    },
+    {
+      "block_id": "b000015",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "제공되는 실제 실행 경로",
+      "anchor": "제공되는-실제-실행-경로",
+      "start_line": 26
+    },
+    {
+      "block_id": "b000017",
+      "parent_id": "b000015",
+      "level": 3,
+      "title": "iiGPU 공통 명령 계층",
+      "anchor": "iigpu-공통-명령-계층",
+      "start_line": 28
+    },
+    {
+      "block_id": "b000035",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "선택, 동시 실행과 실패 처리",
+      "anchor": "선택-동시-실행과-실패-처리",
+      "start_line": 81
+    },
+    {
+      "block_id": "b000049",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "빌드와 의존성",
+      "anchor": "빌드와-의존성",
+      "start_line": 122
+    },
+    {
+      "block_id": "b000057",
+      "parent_id": "b000001",
+      "level": 2,
+      "title": "검증 범위",
+      "anchor": "검증-범위",
+      "start_line": 138
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000023",
+        "line": 43,
+        "text": "iiDecision 라이브러리는 iiGPU를 찾거나 링크하지 않는다. 애플리케이션이 두",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000023",
+        "line": 47,
+        "text": "앱은 이 등록 절차를 추가하고 다시 빌드해야 한다. iiDecision 공개 API에는",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000023",
+        "line": 48,
+        "text": "iiGPU나 네이티브 플랫폼 자료형을 추가하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000043",
+        "line": 109,
+        "text": "보장하지 않는다. 원하는 경로만 지정하여 물리 장치 중복과 초기화 비용을 조정한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000047",
+        "line": 120,
+        "text": "구현자가 보장해야 한다. 외부 백엔드는 입력 span을 반환 이후에 보관해서는 안 된다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      },
+      {
+        "block_id": "b000059",
+        "line": 141,
+        "text": "실제 장치 실행은 별도의 검증이며 단독 빌드나 소비자 컴파일만으로 증명하지 않는다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [
+      {
+        "block_id": "b000025",
+        "language": "sh",
+        "code": "cmake -S examples/gpu-adapter -B build/gpu-adapter \\\n  -DiiDecision_DIR=\"$HOME/.local/SDK/iiDecision/lib/cmake/iiDecision\" \\\n  -DiiGPU_DIR=\"$HOME/.local/SDK/iiGPU/lib/cmake/iiGPU\"\ncmake --build build/gpu-adapter\nctest --test-dir build/gpu-adapter --output-on-failure\n"
+      },
+      {
+        "block_id": "b000053",
+        "language": "sh",
+        "code": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMLX_DIR=/path/to/mlx/share/cmake/MLX\ncmake --build build --parallel 2\nctest --test-dir build --output-on-failure\n"
+      }
+    ],
+    "links": [
+      {
+        "block_id": "b000033",
+        "label": "MLX 공식 문서",
+        "target": "https://ml-explore.github.io/mlx/build/html/install.html",
+        "kind": "external",
+        "line": 76
+      },
+      {
+        "block_id": "b000033",
+        "label": "OpenCL API",
+        "target": "https://registry.khronos.org/OpenCL/specs/unified/html/OpenCL_API.html",
+        "kind": "external",
+        "line": 78
+      },
+      {
+        "block_id": "b000033",
+        "label": "Vulkan 명세",
+        "target": "https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html",
+        "kind": "external",
+        "line": 79
+      },
+      {
+        "block_id": "b000063",
+        "label": "검증 문서",
+        "target": "Verification.md",
+        "kind": "relative",
+        "line": 154
+      }
+    ],
+    "tables": [
+      {
+        "block_id": "b000031",
+        "columns": [
+          "경로",
+          "실행 구현",
+          "장치와 플랫폼 범위"
+        ],
+        "rows": [
+          [
+            "Metal",
+            "MSL 정수 compute kernel, 버퍼 업로드·dispatch·완료 확인·읽기",
+            "macOS의 발견한 모든 Metal 장치, iOS의 기본 Metal 장치"
+          ],
+          [
+            "MLX C++",
+            "GPU stream에서 uint32 `equal`과 행별 `all`, 명시적 `eval`",
+            "설치된 MLX가 제공하는 Metal 또는 CUDA GPU 전체"
+          ],
+          [
+            "OpenCL 1.2+",
+            "정수 kernel 빌드, 모든 플랫폼·장치 열거, queue 실행·동기 읽기",
+            "macOS, Windows, Linux와 지원되는 임베디드 드라이버"
+          ],
+          [
+            "Vulkan 1.1+",
+            "SPIR-V 정수 compute pipeline, descriptor·buffer·fence·호스트 읽기",
+            "Windows, Linux, Android, MoltenVK를 설치한 Apple 플랫폼"
+          ],
+          [
+            "C++23 CPU",
+            "정확한 uint32 비교",
+            "위 SDK가 없는 플랫폼을 포함한 C++23 대상"
+          ]
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

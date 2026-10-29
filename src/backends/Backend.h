@@ -17,5 +17,4 @@ void addMetal(BackendList&);
 void addMlx(BackendList&);
 void addOpenCl(BackendList&);
 void addVulkan(BackendList&);
-void addOnnx(BackendList&, const AccelerationOptions&);
 }
