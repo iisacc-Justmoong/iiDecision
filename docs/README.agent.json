@@ -10,9 +10,9 @@
   },
   "source": {
     "path": "docs/README.md",
-    "sha256": "04b5e2295523b5478627574e59df36aac9b7d6b22dcf91dd84affe801cb2dbd4",
-    "bytes": 1299,
-    "line_count": 23,
+    "sha256": "2a7bf2fca8e20a75bf360cb501c00abe004b9e7460d36faba54901c712319f55",
+    "bytes": 1462,
+    "line_count": 25,
     "encoding": "utf-8",
     "language": "en"
   },
@@ -79,8 +79,8 @@
       "id": "b000008",
       "kind": "table",
       "start_line": 8,
-      "end_line": 22,
-      "raw": "| Document | Agent JSON |\n| --- | --- |\n| [`AGENT.md`](../AGENT.md) | [JSON](entrypoints/AGENT.agent.json) |\n| [`README.md`](../README.md) | [JSON](entrypoints/README.agent.json) |\n| [`docs/Acceleration.md`](Acceleration.md) | [JSON](Acceleration.agent.json) |\n| [`docs/AgenticRag.md`](AgenticRag.md) | [JSON](AgenticRag.agent.json) |\n| [`docs/Contract.md`](Contract.md) | [JSON](Contract.agent.json) |\n| [`docs/Laya.md`](Laya.md) | [JSON](Laya.agent.json) |\n| [`docs/Probability.md`](Probability.md) | [JSON](Probability.agent.json) |\n| [`docs/Research.md`](Research.md) | [JSON](Research.agent.json) |\n| [`docs/RuntimeRetirement.md`](RuntimeRetirement.md) | [JSON](RuntimeRetirement.agent.json) |\n| [`docs/Verification.md`](Verification.md) | [JSON](Verification.agent.json) |\n| [`docs/Windows.md`](Windows.md) | [JSON](Windows.agent.json) |\n| [`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md) | [JSON](WindowsBuildAndRun.agent.json) |\n| [`docs/documentation-structure.md`](documentation-structure.md) | [JSON](documentation-structure.agent.json) |\n",
+      "end_line": 24,
+      "raw": "| Document | Agent JSON |\n| --- | --- |\n| [`AGENT.md`](../AGENT.md) | [JSON](entrypoints/AGENT.agent.json) |\n| [`README.md`](../README.md) | [JSON](entrypoints/README.agent.json) |\n| [`docs/Acceleration.md`](Acceleration.md) | [JSON](Acceleration.agent.json) |\n| [`docs/AgenticRag.md`](AgenticRag.md) | [JSON](AgenticRag.agent.json) |\n| [`docs/BuildLayout.md`](BuildLayout.md) | [JSON](BuildLayout.agent.json) |\n| [`docs/Contract.md`](Contract.md) | [JSON](Contract.agent.json) |\n| [`docs/DynamicLinking.md`](DynamicLinking.md) | [JSON](DynamicLinking.agent.json) |\n| [`docs/Laya.md`](Laya.md) | [JSON](Laya.agent.json) |\n| [`docs/Probability.md`](Probability.md) | [JSON](Probability.agent.json) |\n| [`docs/Research.md`](Research.md) | [JSON](Research.agent.json) |\n| [`docs/RuntimeRetirement.md`](RuntimeRetirement.md) | [JSON](RuntimeRetirement.agent.json) |\n| [`docs/Verification.md`](Verification.md) | [JSON](Verification.agent.json) |\n| [`docs/Windows.md`](Windows.md) | [JSON](Windows.agent.json) |\n| [`docs/WindowsBuildAndRun.md`](WindowsBuildAndRun.md) | [JSON](WindowsBuildAndRun.agent.json) |\n| [`docs/documentation-structure.md`](documentation-structure.md) | [JSON](documentation-structure.agent.json) |\n",
       "columns": [
         "Document",
         "Agent JSON"
@@ -103,8 +103,16 @@
           "[JSON](AgenticRag.agent.json)"
         ],
         [
+          "[`docs/BuildLayout.md`](BuildLayout.md)",
+          "[JSON](BuildLayout.agent.json)"
+        ],
+        [
           "[`docs/Contract.md`](Contract.md)",
           "[JSON](Contract.agent.json)"
+        ],
+        [
+          "[`docs/DynamicLinking.md`](DynamicLinking.md)",
+          "[JSON](DynamicLinking.agent.json)"
         ],
         [
           "[`docs/Laya.md`](Laya.md)",
@@ -143,8 +151,8 @@
     {
       "id": "b000009",
       "kind": "html",
-      "start_line": 23,
-      "end_line": 23,
+      "start_line": 25,
+      "end_line": 25,
       "raw": "<!-- workspace-docs:document-map:end -->\n"
     }
   ],
@@ -228,129 +236,157 @@
       },
       {
         "block_id": "b000008",
+        "label": "`docs/BuildLayout.md`",
+        "target": "BuildLayout.md",
+        "kind": "relative",
+        "line": 14
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "BuildLayout.agent.json",
+        "kind": "relative",
+        "line": 14
+      },
+      {
+        "block_id": "b000008",
         "label": "`docs/Contract.md`",
         "target": "Contract.md",
         "kind": "relative",
-        "line": 14
+        "line": 15
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Contract.agent.json",
         "kind": "relative",
-        "line": 14
+        "line": 15
+      },
+      {
+        "block_id": "b000008",
+        "label": "`docs/DynamicLinking.md`",
+        "target": "DynamicLinking.md",
+        "kind": "relative",
+        "line": 16
+      },
+      {
+        "block_id": "b000008",
+        "label": "JSON",
+        "target": "DynamicLinking.agent.json",
+        "kind": "relative",
+        "line": 16
       },
       {
         "block_id": "b000008",
         "label": "`docs/Laya.md`",
         "target": "Laya.md",
         "kind": "relative",
-        "line": 15
+        "line": 17
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Laya.agent.json",
         "kind": "relative",
-        "line": 15
+        "line": 17
       },
       {
         "block_id": "b000008",
         "label": "`docs/Probability.md`",
         "target": "Probability.md",
         "kind": "relative",
-        "line": 16
+        "line": 18
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Probability.agent.json",
         "kind": "relative",
-        "line": 16
+        "line": 18
       },
       {
         "block_id": "b000008",
         "label": "`docs/Research.md`",
         "target": "Research.md",
         "kind": "relative",
-        "line": 17
+        "line": 19
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Research.agent.json",
         "kind": "relative",
-        "line": 17
+        "line": 19
       },
       {
         "block_id": "b000008",
         "label": "`docs/RuntimeRetirement.md`",
         "target": "RuntimeRetirement.md",
         "kind": "relative",
-        "line": 18
+        "line": 20
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "RuntimeRetirement.agent.json",
         "kind": "relative",
-        "line": 18
+        "line": 20
       },
       {
         "block_id": "b000008",
         "label": "`docs/Verification.md`",
         "target": "Verification.md",
         "kind": "relative",
-        "line": 19
+        "line": 21
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Verification.agent.json",
         "kind": "relative",
-        "line": 19
+        "line": 21
       },
       {
         "block_id": "b000008",
         "label": "`docs/Windows.md`",
         "target": "Windows.md",
         "kind": "relative",
-        "line": 20
+        "line": 22
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "Windows.agent.json",
         "kind": "relative",
-        "line": 20
+        "line": 22
       },
       {
         "block_id": "b000008",
         "label": "`docs/WindowsBuildAndRun.md`",
         "target": "WindowsBuildAndRun.md",
         "kind": "relative",
-        "line": 21
+        "line": 23
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "WindowsBuildAndRun.agent.json",
         "kind": "relative",
-        "line": 21
+        "line": 23
       },
       {
         "block_id": "b000008",
         "label": "`docs/documentation-structure.md`",
         "target": "documentation-structure.md",
         "kind": "relative",
-        "line": 22
+        "line": 24
       },
       {
         "block_id": "b000008",
         "label": "JSON",
         "target": "documentation-structure.agent.json",
         "kind": "relative",
-        "line": 22
+        "line": 24
       }
     ],
     "tables": [
@@ -378,8 +414,16 @@
             "[JSON](AgenticRag.agent.json)"
           ],
           [
+            "[`docs/BuildLayout.md`](BuildLayout.md)",
+            "[JSON](BuildLayout.agent.json)"
+          ],
+          [
             "[`docs/Contract.md`](Contract.md)",
             "[JSON](Contract.agent.json)"
+          ],
+          [
+            "[`docs/DynamicLinking.md`](DynamicLinking.md)",
+            "[JSON](DynamicLinking.agent.json)"
           ],
           [
             "[`docs/Laya.md`](Laya.md)",

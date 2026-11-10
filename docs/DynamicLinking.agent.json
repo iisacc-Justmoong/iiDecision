@@ -1,0 +1,93 @@
+{
+  "format": "iisacc.agent-document",
+  "schema_version": 1,
+  "document_id": "urn:iisacc:document:5e574a07add3fd56b0a0f7df95d1ff488348972038ed86ab6cc166517028b5f0",
+  "project": {
+    "id": "urn:iisacc:project:SDK%2FiiDecision",
+    "name": "iiDecision",
+    "root": "SDK/iiDecision",
+    "kind": "sdk"
+  },
+  "source": {
+    "path": "docs/DynamicLinking.md",
+    "sha256": "03bcb17215da81dba559d53c6e104c0da30bd51235bdcf87ce73c9446436c6fc",
+    "bytes": 473,
+    "line_count": 5,
+    "encoding": "utf-8",
+    "language": "ko"
+  },
+  "document": {
+    "title": "동적 라이브러리 빌드",
+    "role": "guide",
+    "authority": "markdown_source"
+  },
+  "blocks": [
+    {
+      "id": "b000001",
+      "kind": "heading",
+      "start_line": 1,
+      "end_line": 1,
+      "raw": "# 동적 라이브러리 빌드\n",
+      "level": 1,
+      "title": "동적 라이브러리 빌드"
+    },
+    {
+      "id": "b000002",
+      "kind": "blank",
+      "start_line": 2,
+      "end_line": 2,
+      "raw": "\n"
+    },
+    {
+      "id": "b000003",
+      "kind": "paragraph",
+      "start_line": 3,
+      "end_line": 3,
+      "raw": "iiDecision은 기본적으로 공유 라이브러리로 빌드한다. `BUILD_SHARED_LIBS=OFF`는 명시적 정적 빌드 선택이다. iOS에서는 프레임워크, WebAssembly에서는 사이드 모듈을 구성한다. 가속 백엔드는 선택적으로 별도 구성한다.\n"
+    },
+    {
+      "id": "b000004",
+      "kind": "blank",
+      "start_line": 4,
+      "end_line": 4,
+      "raw": "\n"
+    },
+    {
+      "id": "b000005",
+      "kind": "paragraph",
+      "start_line": 5,
+      "end_line": 5,
+      "raw": "공유 대상의 유형과 주요 계약을 테스트한다. 플랫폼별 실제 동작은 해당 운영체제와 도구 체인에서 별도 검증해야 한다.\n"
+    }
+  ],
+  "outline": [
+    {
+      "block_id": "b000001",
+      "parent_id": null,
+      "level": 1,
+      "title": "동적 라이브러리 빌드",
+      "anchor": "동적-라이브러리-빌드",
+      "start_line": 1
+    }
+  ],
+  "indexes": {
+    "directive_candidates": [
+      {
+        "block_id": "b000005",
+        "line": 5,
+        "text": "공유 대상의 유형과 주요 계약을 테스트한다. 플랫폼별 실제 동작은 해당 운영체제와 도구 체인에서 별도 검증해야 한다.",
+        "basis": "lexical_match",
+        "context": "paragraph"
+      }
+    ],
+    "commands": [],
+    "links": [],
+    "tables": []
+  },
+  "provenance": {
+    "generator": "workspace-docs",
+    "version": "1.0.0",
+    "profile": "lossless-blocks-v1",
+    "derived": true
+  }
+}

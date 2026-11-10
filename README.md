@@ -29,6 +29,14 @@ The minimal `IDecisionMaker`, `Candidate`, and `Decision` contracts are retained
 
 <a id="10줄-사용-예제"></a>
 
+The default build includes the module and tests. Enable the optional example
+executables with `-DIIDECISION_BUILD_EXAMPLES=ON`.
+Test reports use disposable resource workspaces, and retained legacy dependency
+paths are linked to `resources/`; see [BuildLayout.md](docs/BuildLayout.md).
+On Unix, `./install.sh` builds into `build/` and installs to
+`~/.local/SDK/iiDecision`; set `IIDECISION_INSTALL_PREFIX` to change the
+destination. Hardware device checks require `IIDECISION_VALIDATE_DEVICES=1`.
+
 ## 10-line usage example
 
 The code below is identical to the [executable example](examples/first_candidate.cpp)and prints `A`.

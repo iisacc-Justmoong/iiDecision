@@ -8,6 +8,7 @@ import platform
 import re
 import subprocess
 import sys
+import ii_file_provider as provider
 
 decimal.getcontext().prec = 90
 D = decimal.Decimal
@@ -94,5 +95,5 @@ report = {'version': version, 'reference_precision_digits': 90, 'mantissa_bits':
           'driver_sha256': hashlib.sha256(pathlib.Path(driver).read_bytes()).hexdigest(),
           'driver_args': driver_args,
           'source_sha256': {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}}
-pathlib.Path(output).write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
+provider.write_text(pathlib.Path(output), json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + '\n')
 print(f'{len(cases)} independent Decimal cases passed; mantissa={bits}; max absolute error={maximum_error}')

@@ -1,5 +1,7 @@
 # iiDecision 0.0.5 검증
 
+> 아래 과거 빌드 경로와 산출물은 당시 기록이며 현재 클린 빌드 후 남지 않을 수 있다. 현재 경로는 [BuildLayout.md](BuildLayout.md)를 따른다.
+
 ## 2026-10-23 근거 정책과 Laya 채점
 
 macOS arm64의 최종 Release 정적 빌드에서 다음 결과를 확인하였다.
@@ -155,12 +157,10 @@ ctest --test-dir build/consumer/build --output-on-failure
 숫자 표현 능력이 다른 플랫폼에서는 해당 플랫폼의 실제 가수 비트를 사용한다.
 이는 검증 fixture의 통과 기준이며 임의 입력 전체에 대한 엄밀한 오차 상한은 아니다.
 
-CTest는 `build/decimal-oracle.json`에 입력 가중치·관측, 기준값·실제 결과,
-사례별 오차, 빌드 설정, 실행 파일과 소스의 SHA-256을 기록한다. 유한값 밖의
-숫자를 JSON number로 쓰지 않으며 정밀 수치는 문자열로 보존한다.
-이번 검증의 구성별 기록은 `build/decimal-oracle-acceleration-static.json`과
-`build/decimal-oracle-acceleration-shared.json`이다. 단일 구성 및 다중 구성
-생성기에서 CMake cache 위치를 찾으며, 활성화한 가속 옵션과 SDK 경로도 기록한다.
+CTest는 독립적인 `resources/.t/` 작업 공간에 입력 가중치·관측, 기준값·실제 결과,
+사례별 오차, 빌드 설정, 실행 파일과 소스의 SHA-256을 기록하고 테스트가 끝나면
+임시 보고서를 정리한다. 유한값 밖의 숫자를 JSON number로 쓰지 않으며 정밀 수치는
+문자열로 보존한다. 단일 구성 및 다중 구성 생성기에서 CMake cache 위치를 찾는다.
 
 ## 실행 결과
 
@@ -234,3 +234,8 @@ Intel·Qualcomm·Huawei·Rockchip·FPGA 등의 물리 장치 실행은 현재 �
 `concurrency` 매크로 및 `Concurrency` 네임스페이스와 겹치지 않는 이름을 사용한다.
 수동 GitHub Actions에는 데스크톱 빌드·테스트 및 Android·iOS
 빌드를 정의하였으며 이번 작업에서 호스팅 실행을 수행하지 않았다.
+
+## 기본 빌드 대상
+
+새 기본 구성은 모듈과 테스트를 빌드한다. 예제 실행 파일은
+`IIDECISION_BUILD_EXAMPLES=ON`으로 명시적으로 켤 때만 생성한다.

@@ -4,8 +4,15 @@ project(iiDecision VERSION 0.0.5 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CTest)
-option(BUILD_SHARED_LIBS "Build iiDecision as a shared library" OFF)
-option(IIDECISION_BUILD_EXAMPLES "Build the first-candidate example" ON)
+if(PROJECT_IS_TOP_LEVEL AND UNIX AND CMAKE_CURRENT_BINARY_DIR STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}/build")
+    include(cmake/ResourceLinks.cmake)
+    decision_compat_links("${CMAKE_CURRENT_SOURCE_DIR}/resources" "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+option(BUILD_SHARED_LIBS "Build iiDecision as a shared library" ON)
+if(EMSCRIPTEN AND BUILD_SHARED_LIBS)
+    set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
+endif()
+option(IIDECISION_BUILD_EXAMPLES "Build the first-candidate example" OFF)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 foreach(_backend MLX OPENCL)
     set(IIDECISION_HAS_${_backend} FALSE)
@@ -97,6 +104,23 @@ set_target_properties(iiDecision PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
     WINDOWS_EXPORT_ALL_SYMBOLS ON)
+if(BUILD_SHARED_LIBS)
+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set_target_properties(iiDecision PROPERTIES FRAMEWORK TRUE FRAMEWORK_VERSION A
+            MACOSX_FRAMEWORK_IDENTIFIER "com.iisacc.iiDecision")
+    elseif(EMSCRIPTEN)
+        target_compile_options(iiDecision PRIVATE -fPIC -sSIDE_MODULE=1)
+        target_link_options(iiDecision PRIVATE -sSIDE_MODULE=1)
+    elseif(APPLE)
+        set_property(TARGET iiDecision APPEND PROPERTY INSTALL_RPATH "@loader_path")
+    elseif(UNIX)
+        set_property(TARGET iiDecision APPEND PROPERTY INSTALL_RPATH "$ORIGIN")
+    endif()
+    if(BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
+        add_test(NAME iiDecision.shared_type COMMAND ${CMAKE_COMMAND}
+            "-DTARGET_TYPE=$<TARGET_PROPERTY:iiDecision,TYPE>" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/shared_target_type.cmake")
+    endif()
+endif()
 if(MSVC)
     target_compile_options(iiDecision PRIVATE /W4 /fp:strict)
     target_compile_definitions(iiDecision PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
@@ -107,7 +131,7 @@ endif()
 install(TARGETS iiDecision EXPORT iiDecisionTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${_decision_public_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iiDecision)
 set(_package_dir "${CMAKE_INSTALL_LIBDIR}/cmake/iiDecision")
 configure_package_config_file(cmake/iiDecisionConfig.cmake.in
@@ -127,6 +151,34 @@ install(FILES tests/acceleration.cpp tests/consumer/gpu.cpp
 install(DIRECTORY third_party/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/third_party")
 
 if(BUILD_TESTING)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    set(_decision_user_home "$ENV{HOME}")
+    if(_decision_user_home STREQUAL "")
+        set(_decision_user_home "$ENV{USERPROFILE}")
+    endif()
+    set(IIDECISION_TEST_PROVIDER_PYTHON_DIR
+        "${_decision_user_home}/.local/SDK/iiFileProvider/share/iiFileProvider/python"
+        CACHE PATH "iiFileProvider Python adapter used by the resource test runner")
+    unset(_decision_user_home)
+    function(decision_resource_test name)
+        add_test(NAME "${name}" COMMAND "${Python3_EXECUTABLE}" -B
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/resource_runner.py"
+            "${IIDECISION_TEST_PROVIDER_PYTHON_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/resources" ${ARGN})
+    endfunction()
+    add_test(NAME iiDecision.resource_runner COMMAND "${CMAKE_COMMAND}" -E env
+        "PYTHONPATH=${IIDECISION_TEST_PROVIDER_PYTHON_DIR}" "${Python3_EXECUTABLE}" -B
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_resource_runner.py")
+    if(UNIX)
+        decision_resource_test(iiDecision.resource_links "${Python3_EXECUTABLE}" -B
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_resource_links.py" "${CMAKE_COMMAND}"
+            "${IIDECISION_TEST_PROVIDER_PYTHON_DIR}" "@WORK@")
+        decision_resource_test(iiDecision.install_policy "${Python3_EXECUTABLE}" -B
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_install_policy.py" "@WORK@")
+    endif()
+    add_test(NAME iiDecision.production_defaults COMMAND "${CMAKE_COMMAND}"
+        "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DBINARY_ROOT=${CMAKE_CURRENT_BINARY_DIR}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/production_defaults.cmake")
     add_test(NAME iiDecision.source_layout COMMAND ${CMAKE_COMMAND}
         "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/source_layout.cmake")
     add_test(NAME iiDecision.sdk_boundary COMMAND ${CMAKE_COMMAND}
@@ -162,12 +214,11 @@ if(BUILD_TESTING)
         add_test(NAME "iiDecision.${_case}" COMMAND iiDecisionProbabilityTests "${_case}")
         set_tests_properties("iiDecision.${_case}" PROPERTIES TIMEOUT 20)
     endforeach()
-    find_package(Python3 REQUIRED COMPONENTS Interpreter)
     add_executable(iiDecisionOracleDriver tests/oracle_driver.cpp)
     target_link_libraries(iiDecisionOracleDriver PRIVATE iiDecision::iiDecision)
-    add_test(NAME iiDecision.DecimalOracle COMMAND "${Python3_EXECUTABLE}"
+    decision_resource_test(iiDecision.DecimalOracle "${Python3_EXECUTABLE}" -B
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/decimal_oracle.py"
-        "$<TARGET_FILE:iiDecisionOracleDriver>" "${CMAKE_CURRENT_BINARY_DIR}/decimal-oracle.json")
+        "$<TARGET_FILE:iiDecisionOracleDriver>" "@WORK@/decimal-oracle.json")
     set_tests_properties(iiDecision.DecimalOracle PROPERTIES TIMEOUT 120)
 endif()
 if(IIDECISION_BUILD_EXAMPLES)
