@@ -5,6 +5,14 @@
 정밀도 계약과 장치·버퍼 재사용 테스트를 보존한다.
 빌드 산출물은 `build/`에 두며 테스트 임시 보고서와 보존된 의존 자료는 `resources/`에 둔다. 다른 프로젝트가 사용하는 기존 경로와 사용자 데이터를 보존한다.
 
+## 라이선스
+
+이 저장소는 iiSDK 모듈 iiDecision이며 Apache License 2.0이다. 자사 코드, 문서, 도구, 테스트가 포함된다. 저작권 표시는 `Copyright (c) 2026 iisacc`이고 고지는 루트 `NOTICE`에 있다. 사람용 한국어 설명은 [docs/License.md](docs/License.md)이다.
+
+`Product` 아래의 iisacc 제품은 GNU Affero General Public License 3.0 이후 버전(AGPL-3.0-or-later)이다.
+
+제3자와 벤더 코드는 원래 라이선스를 유지한다. 문서 재편 중에도 그 라이선스와 외부 원본은 보존한다.
+
 <!-- workspace-docs:agent:start -->
 ## 문서 구조와 에이전트 탐색
 
