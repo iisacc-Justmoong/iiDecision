@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.31)
 project(iiDecision VERSION 0.0.5 LANGUAGES CXX)
+include(./cmake/ModuleImports.cmake)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)

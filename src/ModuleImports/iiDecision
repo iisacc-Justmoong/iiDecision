@@ -1,0 +1,11 @@
+#pragma once
+
+// C++ public entry for iiDecision; the linked components select the API.
+#include <iiDecision/IDecisionMaker.h>
+#include <iiDecision/FirstCandidateDecisionMaker.h>
+#include <iiDecision/ExactDecisionMaker.h>
+#include <iiDecision/Evaluation.h>
+#include <iiDecision/RagDecisionGate.h>
+#include <iiDecision/LayaEvidenceScorer.h>
+#include <iiDecision/LayaDecisionMaker.h>
+#include <iiDecision/Acceleration.h>
