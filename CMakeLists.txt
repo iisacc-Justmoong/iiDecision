@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.31)
 project(iiDecision VERSION 0.0.5 LANGUAGES CXX)
+set(iiDecision_SPDX_LICENSE "Apache-2.0")
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -143,6 +144,7 @@ install(EXPORT iiDecisionTargets NAMESPACE iiDecision:: DESTINATION "${_package_
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/iiDecisionConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/iiDecisionConfigVersion.cmake" DESTINATION "${_package_dir}")
 install(FILES README.md DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision")
+install(FILES LICENSE NOTICE DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision")
 install(DIRECTORY docs/ DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/docs")
 install(DIRECTORY examples/gpu-adapter DESTINATION "${CMAKE_INSTALL_DATADIR}/iiDecision/examples"
     PATTERN "*.iisacc.json" EXCLUDE PATTERN ".*.iisacc-preview" EXCLUDE PATTERN ".iisacc-temporary.lock" EXCLUDE)
@@ -183,6 +185,9 @@ if(BUILD_TESTING)
         "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/source_layout.cmake")
     add_test(NAME iiDecision.sdk_boundary COMMAND ${CMAKE_COMMAND}
         "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/sdk_boundary.cmake")
+    add_test(NAME iiDecision.license COMMAND ${CMAKE_COMMAND}
+        "-DSOURCE_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DBINARY_ROOT=${CMAKE_CURRENT_BINARY_DIR}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/license.cmake")
     add_executable(iiDecisionRagTests tests/rag.cpp)
     target_link_libraries(iiDecisionRagTests PRIVATE iiDecision::iiDecision)
     foreach(_case Answerability Multimodal Ranking Boundaries Workflow Validation Ownership)
